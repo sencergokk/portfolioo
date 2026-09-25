@@ -2,10 +2,12 @@
 
 Sencer Gök'ün kişisel portfolyosu. **Next.js 16 + Three.js** ile yazılmış, tek sayfalık, karanlık temalı bir site.
 Her bölüm tam olarak bir ekran kaplar ve scroll bölümlere oturur. Arka planda scroll ile şekil değiştiren GPU tabanlı
-bir parçacık sahnesi var: **portre → iPhone ana ekranı**.
+bir sahne var: **uygulama yörüngesi → iPhone ana ekranı**.
 
-- **Hero:** fotoğraftan örneklenen ~30K parçacıklık 3B portre. Parçacıklar hafifçe parlar, portrenin üzerinden periyodik
-  bir ışık taraması geçer, imleç parçacıkları iter ve sahne scroll hızına tepki verir.
+- **Hero:** App Store'daki 15 uygulamanın ikonları, altın rengi parçacıklardan oluşan iki eğik yörüngede dönen parlak
+  3B karolar olarak yer alır. Her ikonun arkasında bir kuyruklu yıldız izi bırakılır, uzaktaki ikonlar küçülüp kararır.
+  İmleç bir ikonun üzerine geldiğinde ikon büyür ve yörünge onu "yakalamak" için yavaşlar; aşağı kaydırınca ikonlar
+  merkezdeki çekirdeğe çekilir ve parçacıklar telefona akar.
 - **Uygulamalar:** parçacıklar iPhone 15 Pro oranlarında bir ana ekrana dönüşür. Işık alan titanyum çerçeve ve yan
   tuşlar, açılıp kapanan Dynamic Island, canlı bir widget grafiği, ikonlar üzerinden geçen bir dalga ve cam yansıması
   içerir; telefon süzülür ve yavaşça döner. Ardından her biri bir ekran olan 4 öne çıkan uygulama kartı ve mobilde iOS
@@ -53,7 +55,7 @@ bileşeni yazmak ve `Apps.tsx`'teki `VISUALS` tablosuna bağlamak yeterli.
 
 ### Fotoğrafı değiştirmek
 
-Portre; hakkımda kartı, OG görseli ve 3B parçacık haritası için tek bir fotoğraftan üretilir:
+Portre; hakkımda kartı, OG görseli ve profil rozeti için tek bir fotoğraftan üretilir:
 
 ```bash
 pip install "rembg[cpu]" pillow numpy
@@ -75,11 +77,14 @@ src/
 │   ├── mocks/       uygulama UI mock'ları (CSS ile, görselsiz)
 │   └── ui/          Section, ScaleToFit, Reveal/SplitText/Magnetic/Counter, PhoneFrame, AppGlyph, ikonlar
 └── scene/
-    ├── shapes.ts        deterministik nokta bulutları (portre, parça kimlikli iPhone)
+    ├── shapes.ts        deterministik nokta bulutları (yörünge halkaları, parça kimlikli iPhone)
     ├── shapes.worker.ts şekilleri Web Worker'da üretir (typed array transfer)
-    ├── shaders.ts       morph, telefon animasyonları ve ışıklandırma, imleç etkileşimi (tek draw call)
+    ├── shaders.ts       morph, dönen halkalar ve izler, telefon animasyonları, imleç etkileşimi (tek draw call)
+    ├── orbit.ts         yörünge geometrisi; shader ve ikon mesh'leri aynı hesabı paylaşır
+    ├── AppOrbit.tsx     15 ikon karosu (bevel'li extrude, clearcoat), hover ile yakalama, scroll ile çekirdeğe çekilme
+    ├── iconTextures.ts  ikon dokuları: uygulama renkleri + lucide glifi, canvas'a Path2D ile çizilir
     ├── director.ts      DOM'daki `data-scene` çapalarından scroll'a bağlı sahne durumu
-    ├── ParticleCanvas   R3F canvas, adaptif kalite, görünmezken render durdurma
+    ├── ParticleCanvas   R3F canvas, stüdyo ışığı (RoomEnvironment PMREM), adaptif kalite, görünmezken render durdurma
     └── SceneLayer       lazy-load, WebGL tespiti, CSS fallback
 ```
 
@@ -99,6 +104,8 @@ src/
     GPU'da, kare başına sıfır allocation.
   - Adaptif kalite: kare süresi sürekli ölçülür; yavaşlık sürerse önce DPR (1.5 → 1.25 → 1), sonra çizilen parçacık
     sayısı kademeli düşer. Sahne sönükken daha az, tamamen söndüğünde hiç çizilmez.
+  - Hero ikonları yalnızca hero görünürken çizilir (15 mesh, ortak geometri). Kenar yumuşatma (MSAA) sadece düşük piksel
+    yoğunluklu ekranlarda açılır; retina ekranlarda ve telefonlarda fark edilmediği için kapalıdır.
   - Canlı WebGL tuvalinin üstünde `backdrop-filter` ve `filter: blur` animasyonu kullanılmaz; reveal animasyonları
     yalnızca `transform` ve `opacity` kullanır.
 - **Erişilebilirlik.** Semantik başlık hiyerarşisi, "içeriğe geç" linki, klavye odak stilleri, animasyonlu metinlerde

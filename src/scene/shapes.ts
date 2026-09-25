@@ -1,5 +1,5 @@
 /**
- * Point-cloud generators for the particle scene.
+ * Point-cloud generators for the particle scene: the hero "app orbit" and the phone.
  *
  * Every shape emits exactly `count` points so the vertex shader can morph between them by
  * index. Shapes are normalised to ~1 world unit tall and centred on the origin; the scene
@@ -7,6 +7,8 @@
  *
  * Generation is deterministic (seeded PRNG) so the scene looks identical on every load.
  */
+
+import { RINGS } from "./orbit";
 
 export type Rng = () => number;
 
@@ -26,7 +28,6 @@ type RGB = readonly [number, number, number];
 
 const IVORY: RGB = [0.97, 0.93, 0.86];
 const GOLD: RGB = [0.91, 0.7, 0.4];
-const BRONZE: RGB = [0.45, 0.3, 0.16];
 const TITANIUM: RGB = [0.78, 0.77, 0.75];
 
 const mix = (a: RGB, b: RGB, t: number): RGB => [
@@ -38,10 +39,6 @@ const scale = (c: RGB, k: number): RGB => [c[0] * k, c[1] * k, c[2] * k];
 const hex = (h: string): RGB => {
   const n = parseInt(h.slice(1), 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-};
-const smooth = (e0: number, e1: number, x: number) => {
-  const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
-  return t * t * (3 - 2 * t);
 };
 
 /** Phone part ids, read by the vertex shader (`aKind`) to animate and light each part. */
@@ -65,80 +62,64 @@ export const KIND = {
 
 export type ShapeBuffers = {
   count: number;
-  position: Float32Array; // required by three for bounds; mirrors `portrait`
-  portrait: Float32Array;
+  position: Float32Array; // required by three for bounds; mirrors the hero xyz
+  hero: Float32Array; // vec4: flat ring position (xyz) + ring id (0 = core/dust, 1 = inner, 2 = outer)
   phone: Float32Array;
   scatter: Float32Array;
   rnd: Float32Array; // vec4
-  cPortrait: Float32Array;
+  cHero: Float32Array;
   cPhone: Float32Array;
-  sizes: Float32Array; // vec2: portrait, phone
+  sizes: Float32Array; // vec2: hero, phone
   kind: Float32Array; // float
   meta: Float32Array; // vec4: per-part animation data (e.g. icon centre)
   normal: Float32Array; // vec3: phone surface normal for lighting
 };
 
 /* -------------------------------------------------------------------------- */
-/* Portrait                                                                    */
+/* Hero: two tilted orbit rings, a glowing core and a little star dust         */
 /* -------------------------------------------------------------------------- */
 
-/** Stretch the photo's tonal range and lift mid-tones (the source is a low-key selfie). */
-const levels = (v: number) => Math.pow(Math.min(1, Math.max(0, (v - 0.04) / 0.82)), 0.8);
+function gauss(rng: Rng) {
+  const u = Math.max(rng(), 1e-7);
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rng());
+}
 
-/**
- * Importance-samples the pre-processed portrait map.
- * Channels: R = luminance, G = subject mask, B = edge strength (see scripts/build-portrait-assets.py).
- */
-function samplePortrait(map: ImageData, count: number, rng: Rng, out: ShapeBuffers) {
-  const { width: W, height: H, data } = map;
-  const weights = new Float64Array(W * H);
-  let total = 0;
-  for (let y = 0; y < H; y++) {
-    const v = y / (H - 1);
-    // Dissolve the cropped shoulders into nothing instead of a hard bottom edge.
-    const bottomFade = 1 - smooth(0.78, 1.0, v);
-    for (let x = 0; x < W; x++) {
-      const u = x / (W - 1);
-      const sideFade = smooth(0.0, 0.14, u) * smooth(1.0, 0.86, u);
-      const i = (y * W + x) * 4;
-      const lum = levels(data[i] / 255);
-      const mask = data[i + 1] / 255;
-      const edge = data[i + 2] / 255;
-      // Dark features (hair, beard) keep a base density so the silhouette survives;
-      // edges are boosted so eyes, brows and the beard line stay legible.
-      const w = Math.pow(mask, 1.5) * (0.11 + 0.85 * Math.pow(lum, 1.25) + 1.25 * edge) * bottomFade * sideFade;
-      total += w;
-      weights[y * W + x] = total;
-    }
-  }
-
+function buildOrbit(count: number, rng: Rng, out: ShapeBuffers) {
   for (let p = 0; p < count; p++) {
-    const target = rng() * total;
-    let lo = 0;
-    let hi = weights.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (weights[mid] < target) lo = mid + 1;
-      else hi = mid;
+    const r = rng();
+    let pos: [number, number, number, number];
+    let c: RGB;
+    let size: number;
+    if (r < 0.7) {
+      // rings are stored flat (XZ); the shader spins, tilts and rolls them
+      const ring = r < 0.29 ? 0 : 1;
+      const { radius } = RINGS[ring];
+      const a = rng() * Math.PI * 2;
+      const rr = radius + gauss(rng) * 0.011;
+      pos = [Math.cos(a) * rr, gauss(rng) * 0.0045, Math.sin(a) * rr, ring + 1];
+      c = scale(mix(GOLD, IVORY, rng() * 0.55), 0.5 + rng() * 0.25);
+      size = 0.85 + rng() * 0.3;
+    } else if (r < 0.8) {
+      // core: a small, bright sun at the centre of the orbits
+      const rad = Math.abs(gauss(rng)) * 0.042;
+      const th = rng() * Math.PI * 2;
+      const ph = Math.acos(2 * rng() - 1);
+      pos = [rad * Math.sin(ph) * Math.cos(th), rad * Math.cos(ph), rad * Math.sin(ph) * Math.sin(th), 0];
+      c = scale(mix(IVORY, GOLD, rad / 0.09), 1.1 - rad * 5);
+      size = 1.2 + rng() * 0.6;
+    } else {
+      // dust: a sparse, faint shell around everything
+      const rad = 0.35 + rng() * 0.75;
+      const th = rng() * Math.PI * 2;
+      const ph = Math.acos(2 * rng() - 1);
+      pos = [rad * Math.sin(ph) * Math.cos(th), rad * Math.cos(ph) * 0.6, rad * Math.sin(ph) * Math.sin(th), 0];
+      c = scale(mix(GOLD, IVORY, rng()), 0.16 + rng() * 0.14);
+      size = 0.6 + rng() * 0.4;
     }
-    const px = lo % W;
-    const py = (lo / W) | 0;
-    const i = lo * 4;
-    const lum = levels(data[i] / 255);
-    const edge = data[i + 2] / 255;
-
-    const x = (px + rng()) / W - 0.5;
-    const y = 0.5 - (py + rng()) / H;
-    // Cheap bas-relief: a dome centred on the face plus a touch of luminance depth.
-    const dx = (x - 0.01) / 0.3;
-    const dy = (y - 0.07) / 0.38;
-    const dome = Math.max(0, 1 - dx * dx - dy * dy);
-    const z = 0.14 * dome + (lum - 0.5) * 0.05 + (rng() - 0.5) * 0.012;
-    out.portrait.set([x, y, z], p * 3);
-
-    const base = lum < 0.45 ? mix(scale(BRONZE, 0.7), GOLD, lum / 0.45) : mix(GOLD, IVORY, (lum - 0.45) / 0.55);
-    out.cPortrait.set(scale(base, 0.38 + 0.6 * lum + 0.25 * edge), p * 3);
-    out.sizes[p * 2] = 0.75 + 0.85 * lum + 0.35 * rng();
+    out.hero.set(pos, p * 4);
+    out.position.set([pos[0], pos[1], pos[2]], p * 3);
+    out.cHero.set(c, p * 3);
+    out.sizes[p * 2] = size;
   }
 }
 
@@ -550,16 +531,16 @@ function buildPhone(count: number, rng: Rng, out: ShapeBuffers) {
 
 /* -------------------------------------------------------------------------- */
 
-export function buildShapes(count: number, portraitMap: ImageData, seed = 7): ShapeBuffers {
+export function buildShapes(count: number, seed = 7): ShapeBuffers {
   const rng = createRng(seed);
   const out: ShapeBuffers = {
     count,
     position: new Float32Array(count * 3),
-    portrait: new Float32Array(count * 3),
+    hero: new Float32Array(count * 4),
     phone: new Float32Array(count * 3),
     scatter: new Float32Array(count * 3),
     rnd: new Float32Array(count * 4),
-    cPortrait: new Float32Array(count * 3),
+    cHero: new Float32Array(count * 3),
     cPhone: new Float32Array(count * 3),
     sizes: new Float32Array(count * 2),
     kind: new Float32Array(count),
@@ -567,7 +548,7 @@ export function buildShapes(count: number, portraitMap: ImageData, seed = 7): Sh
     normal: new Float32Array(count * 3),
   };
 
-  samplePortrait(portraitMap, count, rng, out);
+  buildOrbit(count, rng, out);
   buildPhone(count, rng, out);
 
   for (let p = 0; p < count; p++) {
@@ -581,20 +562,5 @@ export function buildShapes(count: number, portraitMap: ImageData, seed = 7): Sh
     );
     out.rnd.set([rng(), rng(), rng(), rng()], p * 4);
   }
-  out.position.set(out.portrait);
   return out;
-}
-
-export async function loadImageData(src: string): Promise<ImageData> {
-  const img = new Image();
-  img.decoding = "async";
-  img.src = src;
-  await img.decode();
-  const canvas = document.createElement("canvas");
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) throw new Error("2D canvas unavailable");
-  ctx.drawImage(img, 0, 0);
-  return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }

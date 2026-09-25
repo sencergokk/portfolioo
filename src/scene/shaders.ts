@@ -1,13 +1,16 @@
 /**
  * Morphing point-cloud shaders.
  *
- * uMorph: 0 = portrait, 1 = phone. Each particle starts its transition with a random delay
- * (aRnd) so the shapes "pour" into each other instead of cross-fading, and a swirl term peaks
- * mid-transition so the in-between reads as a living nebula.
+ * uMorph: 0 = hero "app orbit", 1 = phone. Each particle starts its transition with a random
+ * delay (aRnd) so the shapes "pour" into each other instead of cross-fading, and a swirl term
+ * peaks mid-transition so the in-between reads as a living nebula.
  *
- * The phone is animated entirely on the GPU using its part id (aKind, see KIND in shapes.ts):
- * a lit titanium frame, a Dynamic Island that opens for a live activity, an icon launch wave,
- * a breathing widget chart, a drifting aurora wallpaper and a glass glint.
+ * Hero: two orbit rings spin (uRingA/uRingB), are tilted and rolled exactly like the icon
+ * meshes in AppOrbit.tsx (see orbit.ts), and light up as comet trails behind each icon.
+ *
+ * Phone: animated on the GPU using its part id (aKind, see KIND in shapes.ts): a lit titanium
+ * frame, a Dynamic Island live activity, an icon launch wave, a breathing widget chart, a
+ * drifting aurora wallpaper and a glass glint.
  */
 
 export const vertexShader = /* glsl */ `
@@ -20,12 +23,16 @@ export const vertexShader = /* glsl */ `
   uniform vec3 uMouse;
   uniform float uMouseStrength;
   uniform float uScrollVel;
+  uniform vec2 uRing;        // current spin angle of the inner / outer ring
+  uniform vec2 uRingDir;     // spin direction (+1 / -1) of each ring
+  uniform vec2 uRingCount;   // icons per ring (for the comet trails)
+  uniform vec4 uTilt;        // inner tilt, inner roll, outer tilt, outer roll
 
-  attribute vec3 aPortrait;
+  attribute vec4 aHero;
   attribute vec3 aPhone;
   attribute vec3 aScatter;
   attribute vec4 aRnd;
-  attribute vec3 cPortrait;
+  attribute vec3 cHero;
   attribute vec3 cPhone;
   attribute vec2 aSizes;
   attribute float aKind;
@@ -37,13 +44,56 @@ export const vertexShader = /* glsl */ `
 
   bool isKind(float k) { return abs(aKind - k) < 0.5; }
 
+  vec3 rotX(vec3 p, float a) {
+    float c = cos(a), s = sin(a);
+    return vec3(p.x, c * p.y - s * p.z, s * p.y + c * p.z);
+  }
+  vec3 rotY(vec3 p, float a) {
+    float c = cos(a), s = sin(a);
+    return vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z);
+  }
+  vec3 rotZ(vec3 p, float a) {
+    float c = cos(a), s = sin(a);
+    return vec3(c * p.x - s * p.y, s * p.x + c * p.y, p.z);
+  }
+
   void main() {
     float t1 = smoothstep(0.0, 1.0, clamp((uMorph - aRnd.y * 0.45) / 0.55, 0.0, 1.0));
+
+    // ---------------------------------------------------------------- hero orbit
+    vec3 hp;
+    vec3 hc = cHero;
+    float heroSize = aSizes.x;
+    if (aHero.w < 0.5) {
+      // core and dust drift slowly
+      hp = rotY(aHero.xyz, uTime * 0.04);
+      hc *= 0.8 + 0.4 * sin(uTime * 1.7 + aRnd.x * 30.0);
+    } else {
+      bool inner = aHero.w < 1.5;
+      float spin = inner ? uRing.x : uRing.y;
+      float dir = inner ? uRingDir.x : uRingDir.y;
+      float n = inner ? uRingCount.x : uRingCount.y;
+      float r = length(aHero.xz);
+      float base = atan(aHero.z, aHero.x);
+      float th = base + spin;
+      hp = vec3(cos(th) * r, aHero.y, sin(th) * r);
+      hp = rotX(hp, inner ? uTilt.x : uTilt.z);
+      hp = rotZ(hp, inner ? uTilt.y : uTilt.w);
+      // comet trails: brighten the arc right behind each icon (icons sit at phase 0, the
+      // tile itself covers roughly the first 0.2 of a slot and hides what is under it)
+      float ph = fract(base * n / 6.2831853);
+      float behind = dir > 0.0 ? 1.0 - ph : ph;
+      float trail = 1.0 - smoothstep(0.18, 0.8, behind);
+      trail *= trail;
+      hc += trail * vec3(0.95, 0.72, 0.4) * 0.9;
+      heroSize *= 1.0 + trail * 0.7;
+    }
+    // depth cue: the far side of the orbit recedes
+    hc *= mix(0.45, 1.15, smoothstep(-0.45, 0.45, hp.z));
 
     // ---------------------------------------------------------------- phone
     vec3 ph = aPhone;
     vec3 pc = cPhone;
-    float phoneSize = aSizes.y;
 
     // Dynamic Island live activity: opens for ~3s every 8s
     float cyc = mod(uTime + 2.0, 8.0);
@@ -72,10 +122,10 @@ export const vertexShader = /* glsl */ `
     }
     // titanium frame and buttons are lit by a key light, so they flare as the phone turns
     if (aKind < 2.5) {
-      vec3 n = normalize(normalMatrix * aNormal);
+      vec3 nrm = normalize(normalMatrix * aNormal);
       vec3 L = normalize(vec3(-0.45, 0.65, 0.62));
-      float diff = max(dot(n, L), 0.0);
-      float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 16.0);
+      float diff = max(dot(nrm, L), 0.0);
+      float spec = pow(max(dot(reflect(-L, nrm), vec3(0.0, 0.0, 1.0)), 0.0), 16.0);
       pc = pc * (0.3 + 0.95 * diff) + spec * 0.55;
     } else {
       // glass glint travelling across the screen
@@ -84,7 +134,7 @@ export const vertexShader = /* glsl */ `
     }
 
     // ---------------------------------------------------------------- morph
-    vec3 p = mix(aPortrait, ph, t1);
+    vec3 p = mix(hp, ph, t1);
 
     float transit = sin(t1 * 3.14159);
     vec3 swirl = vec3(
@@ -95,7 +145,7 @@ export const vertexShader = /* glsl */ `
     p += swirl * (transit * (0.08 + aRnd.w * 0.22) + uScrollVel * (0.012 + aRnd.w * 0.03));
 
     // idle shimmer (kept small on the phone so its edges stay crisp)
-    p += 0.0045 * (1.0 - 0.75 * t1) * vec3(
+    p += 0.004 * (1.0 - 0.75 * t1) * vec3(
       sin(uTime * 1.3 + aRnd.x * 40.0),
       cos(uTime * 1.1 + aRnd.y * 40.0),
       sin(uTime * 0.9 + aRnd.z * 40.0)
@@ -113,21 +163,12 @@ export const vertexShader = /* glsl */ `
     p.xy += (d / max(dist, 1e-4)) * f * 0.085;
     p.z += f * 0.26;
 
-    vec3 col = mix(cPortrait, pc, t1);
+    vColor = mix(hc, pc, t1) + f * vec3(0.35, 0.26, 0.14);
 
-    // portrait only: a warm scan-light every ~12s and a depth cue on the relief
-    float portrait = 1.0 - t1;
-    float sweep = 1.25 - mod(uTime * 0.21, 2.5);
-    float band = exp(-pow((p.y * 0.92 + p.x * 0.38 - sweep) / 0.035, 2.0)) * portrait * ti;
-    col += band * vec3(1.0, 0.76, 0.42) * 0.6;
-    col *= mix(1.0, mix(0.62, 1.12, clamp(p.z * 3.2 + 0.5, 0.0, 1.0)), portrait);
-    col += f * vec3(0.35, 0.26, 0.14);
-    vColor = col;
-
-    float size = mix(aSizes.x, phoneSize, t1);
+    float size = mix(heroSize, aSizes.y, t1);
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = uSize * size * uPixelRatio * (1.0 / -mv.z) * (1.0 + f * 0.6 + band * 0.45);
+    gl_PointSize = uSize * size * uPixelRatio * (1.0 / -mv.z) * (1.0 + f * 0.6);
 
     vAlpha = uAlpha * (0.35 + 0.65 * ti);
   }

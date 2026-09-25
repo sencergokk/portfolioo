@@ -3,12 +3,18 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { AppOrbit, type OrbitFrame, type OrbitHandle } from "./AppOrbit";
 import { SceneDirector, type SceneState } from "./director";
 import { fragmentShader, vertexShader } from "./shaders";
 import { loadShapes } from "./loadShapes";
+import { RINGS, TILTS, type RingTilt } from "./orbit";
 import type { ShapeBuffers } from "./shapes";
 
-const PORTRAIT_MAP = "/scene/portrait-map.png";
+const MOBILE_QUERY = "(max-width: 767px)";
+/** Narrow or portrait screens get the flatter orbit (it has to fit a short band above the copy). */
+const COMPACT_QUERY = "(max-width: 767px), (orientation: portrait)";
+const ENV_ROTATION = new THREE.Euler(0, Math.PI, 0);
 const BG = "#070708";
 const MAX_DPR = 1.5;
 
@@ -44,6 +50,7 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
     x: 0,
     y: 0,
     scale: 0,
+    fitW: 0,
     alpha: 0,
     px: 0,
     py: 0,
@@ -53,19 +60,23 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
     lastScroll: 0,
     primed: false,
   });
-  const target = useRef<SceneState>({ morph: 0, x: 0, y: 0, scale: 1, alpha: 1 });
+  const target = useRef<SceneState>({ morph: 0, x: 0, y: 0, scale: 1, fitW: 9, alpha: 1 });
   const perf = useRef({ level: 0, frames: 0, total: 0, slowWindows: 0, elapsed: 0 });
   const cleared = useRef(false);
+  const orbit = useRef<OrbitHandle | null>(null);
+  const orbitFrame = useRef<OrbitFrame | null>(null);
+  const spin = useRef({ angles: [0, 0] as [number, number], caught: 0 });
+  const tilts = useRef<readonly [RingTilt, RingTilt]>(TILTS.desktop);
   const setDpr = useThree((s) => s.setDpr);
 
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(shapes.position, 3));
-    g.setAttribute("aPortrait", new THREE.BufferAttribute(shapes.portrait, 3));
+    g.setAttribute("aHero", new THREE.BufferAttribute(shapes.hero, 4));
     g.setAttribute("aPhone", new THREE.BufferAttribute(shapes.phone, 3));
     g.setAttribute("aScatter", new THREE.BufferAttribute(shapes.scatter, 3));
     g.setAttribute("aRnd", new THREE.BufferAttribute(shapes.rnd, 4));
-    g.setAttribute("cPortrait", new THREE.BufferAttribute(shapes.cPortrait, 3));
+    g.setAttribute("cHero", new THREE.BufferAttribute(shapes.cHero, 3));
     g.setAttribute("cPhone", new THREE.BufferAttribute(shapes.cPhone, 3));
     g.setAttribute("aSizes", new THREE.BufferAttribute(shapes.sizes, 2));
     g.setAttribute("aKind", new THREE.BufferAttribute(shapes.kind, 1));
@@ -89,6 +100,10 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
       uMouse: { value: new THREE.Vector3(9, 9, 0) },
       uMouseStrength: { value: 0 },
       uScrollVel: { value: 0 },
+      uRing: { value: new THREE.Vector2() },
+      uRingDir: { value: new THREE.Vector2(Math.sign(RINGS[0].speed), Math.sign(RINGS[1].speed)) },
+      uRingCount: { value: new THREE.Vector2(RINGS[0].count, RINGS[1].count) },
+      uTilt: { value: new THREE.Vector4() },
     }),
     [reducedMotion],
   );
@@ -96,7 +111,11 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
   useEffect(() => {
     const d = new SceneDirector();
     director.current = d;
-    const measure = () => d.measure();
+    const mq = window.matchMedia(COMPACT_QUERY);
+    const measure = () => {
+      d.measure();
+      tilts.current = TILTS[mq.matches ? "mobile" : "desktop"];
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(document.body);
@@ -137,6 +156,7 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
     s.x = damp(s.x, t.x, 2.4, dt);
     s.y = damp(s.y, t.y, 2.4, dt);
     s.scale = damp(s.scale, t.scale, 2.4, dt);
+    s.fitW = damp(s.fitW, t.fitW, 2.4, dt);
     s.alpha = damp(s.alpha, t.alpha, 3, dt);
 
     // scroll speed (px/s) → 0..1, used to loosen the particles a touch while moving
@@ -153,16 +173,16 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
     s.my = damp(s.my, p.y, 9, dt);
 
     const time = u.uTime.value as number;
-    // 0 = portrait, 1 = phone: the phone floats and slowly turns so its titanium frame catches the light
+    // 0 = orbit, 1 = phone: the phone floats and slowly turns so its titanium frame catches the light
     const phone = smoothstep(0.55, 1, s.morph);
     const idle = reducedMotion ? 0 : 1;
     g.position.set(s.x * vw, s.y * vh + Math.sin(time * 0.8) * 0.012 * vh * phone * idle, 0);
-    const k = s.scale * vh;
+    const k = Math.min(s.scale * vh, s.fitW * vw);
     g.scale.setScalar(k);
     g.rotation.y =
-      s.px * (0.22 + 0.16 * phone) +
+      s.px * (0.3 + 0.08 * phone) +
       idle * (Math.sin(time * 0.17) * 0.07 * (1 - phone) + Math.sin(time * 0.42) * 0.34 * phone);
-    g.rotation.x = -s.py * 0.1 + idle * Math.sin(time * 0.31) * 0.06 * phone;
+    g.rotation.x = -s.py * (0.16 - 0.06 * phone) + idle * Math.sin(time * 0.31) * 0.06 * phone;
     g.rotation.z = idle * Math.sin(time * 0.23) * 0.025 * phone;
 
     // cursor in the group's local space (rotation ignored — small angles)
@@ -171,12 +191,48 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
       ((s.my * vh) / 2 - g.position.y) / k,
       0,
     );
-    u.uMouseStrength.value = damp(u.uMouseStrength.value as number, pointerActive ? 1 : 0, 4, dt);
+    // while an icon is caught the cursor stops stirring particles over it
+    const stir = pointerActive ? 1 - 0.9 * spin.current.caught : 0;
+    u.uMouseStrength.value = damp(u.uMouseStrength.value as number, stir, 4, dt);
 
     if (!reducedMotion) {
       u.uTime.value = time + dt;
       u.uIntro.value = Math.min(1, (u.uIntro.value as number) + dt / 2.8);
     }
+    // Orbit: rings spin in JS so the icon meshes and the particle rings share one angle.
+    // Hovering an icon "catches" the orbit and slows it right down.
+    const sp = spin.current;
+    const tl = tilts.current;
+    if (!reducedMotion) {
+      const pace = 1 - 0.85 * sp.caught;
+      sp.angles[0] += dt * RINGS[0].speed * pace;
+      sp.angles[1] += dt * RINGS[1].speed * pace;
+    }
+    (u.uRing.value as THREE.Vector2).set(sp.angles[0], sp.angles[1]);
+    (u.uTilt.value as THREE.Vector4).set(tl[0].tilt, tl[0].roll, tl[1].tilt, tl[1].roll);
+    const of = (orbitFrame.current ??= {
+      time: 0,
+      dt: 0,
+      angles: sp.angles,
+      tilts: tl,
+      visibility: 0,
+      intro: 0,
+      pointer: { x: 0, y: 0, active: false },
+      camera: state.camera,
+      reducedMotion,
+    });
+    of.time = time;
+    of.dt = dt;
+    of.tilts = tl;
+    of.visibility = s.alpha * (1 - smoothstep(0.04, 0.3, s.morph));
+    of.intro = u.uIntro.value as number;
+    of.pointer.x = p.x;
+    of.pointer.y = p.y;
+    of.pointer.active = pointerActive;
+    of.camera = state.camera;
+    of.reducedMotion = reducedMotion;
+    sp.caught = orbit.current?.update(of) ?? 0;
+
     u.uMorph.value = s.morph;
     u.uAlpha.value = s.alpha;
     u.uScrollVel.value = s.scrollVel;
@@ -218,7 +274,11 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
 
   return (
     <group ref={group}>
-      <points ref={points} geometry={geometry} frustumCulled={false}>
+      {/* A warm "sun" at the core of the orbit lights the icons' rims from inside. */}
+      <pointLight color="#e8b86b" intensity={0.6} decay={2} />
+      <AppOrbit ref={orbit} />
+      {/* Icons write depth first (renderOrder), so they hide the ring particles passing behind them. */}
+      <points ref={points} geometry={geometry} frustumCulled={false} renderOrder={1}>
         <shaderMaterial
           ref={material}
           uniforms={uniforms}
@@ -226,7 +286,6 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
           fragmentShader={fragmentShader}
           transparent
           depthWrite={false}
-          depthTest={false}
           blending={THREE.AdditiveBlending}
         />
       </points>
@@ -236,13 +295,16 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
 
 export default function ParticleCanvas({ reducedMotion, onReady }: { reducedMotion: boolean; onReady?: () => void }) {
   const [shapes, setShapes] = useState<ShapeBuffers | null>(null);
+  // MSAA only where the icons' edges would visibly stair-step: on high-density screens (phones,
+  // retina laptops) it costs fill rate for no visible gain.
+  const [antialias] = useState(() => window.devicePixelRatio < 2);
 
   useEffect(() => {
     let cancelled = false;
-    const small = window.matchMedia("(max-width: 767px)").matches;
+    const small = window.matchMedia(MOBILE_QUERY).matches;
     const weak = (navigator.hardwareConcurrency ?? 8) <= 4;
     const count = small || weak ? 14000 : 30000;
-    loadShapes(PORTRAIT_MAP, count)
+    loadShapes(count)
       .then((result) => {
         if (!cancelled) setShapes(result);
       })
@@ -255,15 +317,45 @@ export default function ParticleCanvas({ reducedMotion, onReady }: { reducedMoti
   return (
     <Canvas
       dpr={[1, MAX_DPR]}
-      gl={{ antialias: false, alpha: false, powerPreference: "high-performance", stencil: false }}
+      // the studio's brightest panel sits behind the camera; turning the room keeps it out of
+      // the icons' faces (they would wash out) and leaves it for the bevels to catch
+      scene={{ environmentIntensity: 0.9, environmentRotation: ENV_ROTATION }}
+      gl={{
+        antialias,
+        alpha: false,
+        powerPreference: "high-performance",
+        stencil: false,
+        // keeps the icons' accent colours true and rolls bright highlights off instead of clipping
+        toneMapping: THREE.NeutralToneMapping,
+      }}
       camera={{ position: [0, 0, 5], fov: 35, near: 0.1, far: 50 }}
       onCreated={({ gl }) => gl.setClearColor(BG, 1)}
       style={{ position: "absolute", inset: 0 }}
     >
+      <Studio />
+      <directionalLight position={[-3, 4, 5]} intensity={1.1} color="#fff1dc" />
       {shapes && <Particles shapes={shapes} reducedMotion={reducedMotion} />}
       {shapes && onReady && <ReadySignal onReady={onReady} />}
     </Canvas>
   );
+}
+
+/**
+ * Image-based lighting for the glossy icons: a procedural studio room baked into a PMREM once,
+ * so there is no HDR file to download.
+ */
+function Studio() {
+  const gl = useThree((s) => s.gl);
+  const env = useMemo(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const target = pmrem.fromScene(room, 0.04);
+    room.dispose();
+    pmrem.dispose();
+    return target;
+  }, [gl]);
+  useEffect(() => () => env.dispose(), [env]);
+  return <primitive object={env.texture} attach="environment" />;
 }
 
 /** Fires once after the first frame containing particles has rendered. */

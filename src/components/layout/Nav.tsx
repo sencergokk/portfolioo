@@ -60,12 +60,12 @@ export function Nav() {
             scrolled ? "opacity-100" : "opacity-0",
           )}
         />
-        <nav aria-label="Ana menü" className="container-page flex h-[72px] items-center justify-between gap-6">
+        <nav aria-label="Ana menü" className="container-page flex h-[72px] items-center justify-between gap-4 lg:gap-6">
           <a href="#top" className="group flex items-center gap-3" aria-label={`${site.name}, başa dön`}>
             <span className="relative grid h-9 w-9 place-items-center rounded-full border border-line-strong bg-bg-2 font-serif text-lg text-accent transition-colors group-hover:border-accent/60">
               S
             </span>
-            <span className="hidden text-sm leading-tight sm:block">
+            <span className="hidden text-sm leading-tight whitespace-nowrap sm:block md:max-lg:hidden">
               <span className="block font-medium text-fg">{site.name}</span>
               <span className="block text-fg-3">iOS & Web</span>
             </span>
@@ -77,7 +77,7 @@ export function Nav() {
                 <a
                   href={`#${item.id}`}
                   className={cn(
-                    "relative isolate block rounded-full px-4 py-2 text-sm transition-colors",
+                    "relative isolate block rounded-full px-3.5 py-2 text-sm whitespace-nowrap transition-colors lg:px-4",
                     active === item.id ? "text-bg" : "text-fg-2 hover:text-fg",
                   )}
                   aria-current={active === item.id ? "true" : undefined}
@@ -98,7 +98,7 @@ export function Nav() {
           <div className="flex items-center gap-2">
             <a
               href={`mailto:${site.email}`}
-              className="hidden h-10 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-medium text-bg transition-[background-color,transform] hover:bg-accent-soft active:scale-[0.97] md:inline-flex"
+              className="hidden h-10 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-medium whitespace-nowrap text-bg transition-[background-color,transform] hover:bg-accent-soft active:scale-[0.97] md:inline-flex"
             >
               Bana yaz <ArrowUpRight size={16} />
             </a>

@@ -1,15 +1,13 @@
-import { buildShapes, loadImageData, type ShapeBuffers } from "./shapes";
+import { buildShapes, type ShapeBuffers } from "./shapes";
 import type { WorkerResponse } from "./shapes.worker";
 
 /**
- * Samples the portrait map and generates every shape in a Web Worker (typed arrays are
- * transferred, not copied). Falls back to the main thread where workers/OffscreenCanvas are missing.
+ * Generates every shape in a Web Worker (typed arrays are transferred, not copied) and falls
+ * back to the main thread where workers are unavailable.
  */
-export function loadShapes(src: string, count: number): Promise<ShapeBuffers> {
-  const url = new URL(src, window.location.href).href;
-  const onMainThread = () => loadImageData(url).then((map) => buildShapes(count, map));
-
-  if (typeof Worker === "undefined" || typeof OffscreenCanvas === "undefined") return onMainThread();
+export function loadShapes(count: number): Promise<ShapeBuffers> {
+  const onMainThread = () => Promise.resolve(buildShapes(count));
+  if (typeof Worker === "undefined") return onMainThread();
 
   return new Promise<ShapeBuffers>((resolve, reject) => {
     let worker: Worker;
@@ -29,6 +27,6 @@ export function loadShapes(src: string, count: number): Promise<ShapeBuffers> {
       resolve(e.data.shapes);
     };
     worker.onerror = fallback;
-    worker.postMessage({ url, count });
+    worker.postMessage({ count });
   });
 }

@@ -24,12 +24,12 @@ export function Hero() {
 
   return (
     <Section id="top" scene="hero" className="overflow-hidden">
-      {/* Mobile: the particle portrait owns the top of the screen and the copy sits below it. */}
-      <div className="container-page relative flex flex-1 flex-col justify-end pt-[44svh] pb-[max(1.25rem,4svh)] md:justify-center md:pt-[max(5.5rem,9svh)] md:pb-[max(6rem,13svh)]">
+      {/* Phones and portrait tablets: the 3D app orbit owns the top of the screen and the copy sits below it. */}
+      <div className="container-page relative flex flex-1 flex-col justify-end pt-[44svh] pb-[max(1.25rem,4svh)] md:justify-center md:pt-[max(5.5rem,9svh)] md:pb-[max(6rem,13svh)] md:portrait:justify-end md:portrait:pt-[40svh] md:portrait:pb-[max(6rem,12svh)]">
         <div className="flex max-w-[46rem] flex-col">
           <motion.div
             {...fade(0.2)}
-            className="glass order-3 mt-4 inline-flex w-fit items-center gap-3 rounded-full py-1.5 pr-4 pl-1.5 max-md:hidden max-md:tall:inline-flex md:order-none md:mt-0"
+            className="glass order-3 mt-4 inline-flex w-fit items-center gap-3 rounded-full py-1.5 pr-4 pl-1.5 max-md:hidden max-md:tall:inline-flex md:order-none md:mt-0 md:portrait:hidden"
           >
             <span className="relative h-8 w-8 overflow-hidden rounded-full bg-bg-3 ring-1 ring-line-strong">
               <Image src={site.photo.cutout} alt="" fill sizes="32px" className="object-cover object-top" priority />
