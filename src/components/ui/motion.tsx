@@ -5,7 +5,7 @@ import { createElement, useEffect, useRef, type PointerEvent, type ReactNode } f
 import { cn, EASE_OUT_EXPO } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
-/* Reveal — fade/rise/unblur when scrolled into view                           */
+/* Reveal — fade/rise when scrolled into view (transform + opacity only)       */
 /* -------------------------------------------------------------------------- */
 
 const revealTags = { div: motion.div, li: motion.li, span: motion.span } as const;
@@ -30,8 +30,8 @@ export function Reveal({
   return (
     <Tag
       className={className}
-      initial={{ opacity: 0, y, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount }}
       transition={reduced ? { duration: 0 } : { duration: 1.1, ease: EASE_OUT_EXPO, delay }}
     >
@@ -75,10 +75,12 @@ export function SplitText({
       const i = index++;
       return (
         <span key={`${si}-${wi}`}>
-          <span className="inline-block overflow-hidden pb-[0.12em] -mb-[0.12em] align-top">
+          {/* The mask is padded on every side (and pulled back with negative margins) so accents
+              like İ/Ö and descenders like ş/ç/ğ/y are never clipped once the word has risen. */}
+          <span className="-mx-[0.08em] -mt-[0.25em] -mb-[0.2em] inline-block overflow-hidden px-[0.08em] pt-[0.25em] pb-[0.2em] align-top">
             <motion.span
-              className={cn("inline-block will-change-transform", seg.className)}
-              initial={{ y: "115%", rotate: 4 }}
+              className={cn("inline-block", seg.className)}
+              initial={{ y: "140%", rotate: 4 }}
               animate={show ? { y: "0%", rotate: 0 } : undefined}
               transition={
                 reduced ? { duration: 0 } : { duration: 1.15, ease: EASE_OUT_EXPO, delay: delay + i * stagger }

@@ -14,8 +14,8 @@ export function Hero() {
   // Keep initial/animate stable across hydration (useReducedMotion is null on the server);
   // reduced-motion users just get an instant transition.
   const fade = (delay: number) => ({
-    initial: { opacity: 0, y: 18, filter: "blur(6px)" },
-    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0 },
     transition: reduced ? { duration: 0 } : { duration: 1.2, ease: EASE_OUT_EXPO, delay },
   });
 
@@ -59,15 +59,15 @@ export function Hero() {
               <SplitText
                 immediate
                 delay={0.5}
-                segments={[{ text: `${site.lastName}.`, className: "text-gold pr-[0.08em]" }]}
-                className="block pl-[0.04em] font-serif text-[clamp(4.9rem,16vw,13.5rem)] leading-[0.86] tracking-[-0.03em] italic md:pl-[0.55em]"
+                segments={[{ text: `${site.lastName}.`, className: "text-gold" }]}
+                className="block pl-[0.02em] font-serif text-[clamp(4.6rem,15vw,12.5rem)] leading-[0.9] tracking-[-0.035em] md:pl-[0.5em]"
               />
             </span>
           </h1>
 
           <motion.p
             {...fade(0.75)}
-            className="order-2 mt-5 font-serif text-2xl text-fg italic md:order-none md:mt-8 md:text-[2rem]"
+            className="order-2 mt-5 font-serif text-2xl tracking-[-0.015em] text-fg md:order-none md:mt-8 md:text-[2rem]"
           >
             {site.role}
           </motion.p>
@@ -75,9 +75,9 @@ export function Hero() {
             {...fade(0.85)}
             className="order-4 mt-5 max-w-xl text-base leading-relaxed text-pretty text-fg-2 md:order-none md:mt-4 md:text-lg"
           >
-            Gündüzleri <span className="text-fg">TEKNOPAR</span>&apos;da Next.js ve Java ile endüstriyel veriyi okunur
-            arayüzlere dönüştürüyorum; geceleri SwiftUI ile <span className="text-fg">App Store&apos;da yaşayan</span>{" "}
-            kendi uygulamalarımı tasarlayıp yayınlıyorum.
+            Gündüzleri Java, Spring Boot ve Next.js ile <span className="text-fg">kurumsal MES ve ERP yazılımları</span>{" "}
+            geliştiriyorum; geceleri SwiftUI ile <span className="text-fg">App Store&apos;da yaşayan</span> kendi
+            uygulamalarımı tasarlayıp yayınlıyorum.
           </motion.p>
 
           <motion.div {...fade(1)} className="order-5 mt-8 flex flex-wrap items-center gap-3 md:order-none">
@@ -111,8 +111,8 @@ export function Hero() {
           className="mt-12 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-6 md:absolute md:inset-x-10 md:bottom-8 md:mt-0 md:grid-cols-4 xl:inset-x-14"
         >
           <div>
-            <dt className="label">Şu an</dt>
-            <dd className="mt-1.5 text-sm text-fg">{site.currentRole.company}</dd>
+            <dt className="label">Odak</dt>
+            <dd className="mt-1.5 text-sm text-fg">{site.focus}</dd>
           </div>
           <div>
             <dt className="label">App Store</dt>

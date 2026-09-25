@@ -1,48 +1,56 @@
 export type Role = {
+  /** Kept generic on purpose — the employer is not named on the site. */
   company: string;
   team?: string;
   title: string;
   period: string;
   current?: boolean;
   summary: string;
+  highlights?: readonly string[];
   tags: readonly string[];
 };
 
 export const experience: readonly Role[] = [
   {
-    company: "TEKNOPAR Endüstriyel Otomasyon",
-    team: "TIA Platform",
-    title: "Yazılım Mühendisi",
-    period: "Haz 2025 — Günümüz",
+    company: "Endüstriyel otomasyon",
+    team: "Kurumsal MES & ERP",
+    title: "Yazılım Geliştirici",
+    period: "Tem 2025 — Günümüz",
     current: true,
     summary:
-      "REST API'ler ve WebSocket üzerinden akan endüstriyel verileri Next.js ile gerçek zamanlı görselleştiren, raporlara dönüştüren performans odaklı arayüzler geliştiriyorum. Java ile REST servislerinin geliştirilmesi, hata iyileştirmeleri ve ERP entegrasyon süreçlerinde yer alıyorum.",
-    tags: ["Next.js", "TypeScript", "WebSocket", "Java", "Spring Boot", "ERP"],
+      "Kurumsal MES yazılımının backend geliştirmesini ve bakımını Java ve Spring Boot ile yürütüyor; aynı ürünün Next.js arayüzlerini ve veri görselleştirme bileşenlerini geliştiriyorum.",
+    highlights: [
+      "RESTful API tasarımı; servislerin frontend ve harici sistemlerle entegrasyonu",
+      "MES ile ERP arasındaki veri alışverişi ve iletişim mekanizmaları",
+      "Veritabanı tasarımı, SQL geliştirme ve sorgu optimizasyonu",
+      "Docker ile konteynerleştirme, geliştirme ve dağıtım ortamlarının yönetimi",
+      "Kurumsal sistem ve verilerle konuşan LLM tabanlı chatbot çözümleri",
+    ],
+    tags: ["Java", "Spring Boot", "REST", "Next.js", "PostgreSQL", "Docker", "ERP", "LLM"],
   },
   {
-    company: "TEKNOPAR Endüstriyel Otomasyon",
-    team: "TIA Platform",
+    company: "Bağımsız",
+    team: "App Store",
+    title: "iOS Geliştirici",
+    period: "2024 — Günümüz",
+    current: true,
+    summary:
+      "Kendi ürünlerimi fikirden yayına tek başıma taşıyorum: ürün ve arayüz tasarımı, SwiftUI ile geliştirme, abonelik ve uygulama içi satın alma, mağaza optimizasyonu ve çok dilli yayın.",
+    highlights: [
+      "StoreKit ile abonelik ve uygulama içi satın alma akışları",
+      "Supabase ve Firebase ile backend, gizlilik odaklı analitik",
+      "fastlane ile otomatik ekran görüntüsü ve 7 dilde mağaza metadatası",
+    ],
+    tags: ["SwiftUI", "StoreKit", "Supabase", "Firebase", "fastlane", "ASO"],
+  },
+  {
+    company: "Endüstriyel otomasyon",
+    team: "Kurumsal MES & ERP",
     title: "Yazılım Stajyeri",
-    period: "Kas 2024 — Haz 2025",
+    period: "Şub — Haz 2025",
     summary:
-      "Gönüllü ve uzun dönem stajımda Next.js ile ölçeklenebilir arayüzler ve rapor sayfaları geliştirdim. Supabase ile kullanıcı yönetimi ve veritabanı işlemlerini kurdum, RESTful API entegrasyonları yaptım, Git akışlarıyla ekip içi geliştirme süreçlerine dahil oldum.",
-    tags: ["Next.js", "Supabase", "REST", "Git"],
-  },
-  {
-    company: "Febrics Bilişim Teknolojileri",
-    title: "Stajyer",
-    period: "Haz — Ağu 2024",
-    summary:
-      "Bilgi teknolojileri üzerine sunum ve araştırmalar yaptım; C++, JavaScript ve React Native üzerine kendimi geliştirdim.",
-    tags: ["React Native", "JavaScript", "C++"],
-  },
-  {
-    company: "NetDataSoft Bilişim Teknolojileri",
-    title: "Gönüllü Stajyer",
-    period: "Haz — Ağu 2022",
-    summary:
-      "HTML, CSS ve Bootstrap eğitimleri aldım; SHA algoritmaları, MD5 ve Code Smell üzerine sunumlar hazırladım.",
-    tags: ["HTML", "CSS", "Bootstrap"],
+      "Next.js ile ölçeklenebilir arayüzler ve rapor sayfaları geliştirdim; kullanıcı yönetimi ve veritabanı işlemleri, RESTful API entegrasyonları ve Git akışlarıyla ekip içi yazılım geliştirme süreçlerine dahil oldum.",
+    tags: ["Next.js", "REST", "SQL", "Git"],
   },
 ];
 

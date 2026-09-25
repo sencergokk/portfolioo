@@ -43,6 +43,6 @@ export function SectionHeading({
   );
 }
 
-/** Serif italic accent used inside headings. */
-export const serif = "font-serif italic font-normal tracking-[-0.02em]";
+/** Upright display-serif accent used inside headings. */
+export const serif = "font-serif font-normal tracking-[-0.025em]";
 export const serifGold = `${serif} text-gold`;

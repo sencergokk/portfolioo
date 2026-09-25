@@ -21,7 +21,7 @@ export function Experience() {
           index="03"
           label="Deneyim"
           title={[{ text: "Endüstriyel veriden" }, { text: "cebinizdeki ekrana.", className: serifGold }]}
-          description="Kurumsal ekiplerde gerçek zamanlı veriyle çalışan arayüzler geliştiriyor, aynı disiplini kendi ürünlerime taşıyorum."
+          description="Kurumsal ekiplerde servisten arayüze uçtan uca yazılım geliştiriyor, aynı disiplini kendi ürünlerime taşıyorum."
         />
 
         <div className="mt-16 grid gap-14 md:mt-24 md:grid-cols-12 md:gap-10">
@@ -63,6 +63,16 @@ export function Experience() {
                   {role.team && <span className="text-fg-3"> — {role.team}</span>}
                 </p>
                 <p className="mt-4 max-w-2xl leading-relaxed text-pretty text-fg-2">{role.summary}</p>
+                {role.highlights && (
+                  <ul className="mt-4 max-w-2xl space-y-2">
+                    {role.highlights.map((h) => (
+                      <li key={h} className="flex gap-3 text-sm leading-relaxed text-fg-2">
+                        <span aria-hidden className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-accent" />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Teknolojiler">
                   {role.tags.map((t) => (
                     <li key={t} className="rounded-full border border-line px-3 py-1 font-mono text-[11px] text-fg-2">
@@ -76,17 +86,14 @@ export function Experience() {
 
           <aside className="space-y-6 md:col-span-4">
             <div className="md:sticky md:top-28 md:space-y-6">
-              <Reveal className="rounded-3xl border border-line bg-bg-2/80 p-6 backdrop-blur-md md:p-7">
+              <Reveal className="rounded-3xl border border-line bg-bg-2/95 p-6 md:p-7">
                 <GraduationCap className="text-accent" size={22} aria-hidden />
                 <p className="mt-5 label">Eğitim</p>
                 <p className="mt-2 text-xl font-medium tracking-tight">{education.school}</p>
                 <p className="mt-1 text-fg-2">{education.degree}</p>
                 <p className="mt-3 font-mono text-xs text-fg-3">{education.period}</p>
               </Reveal>
-              <Reveal
-                delay={0.08}
-                className="mt-6 rounded-3xl border border-line bg-bg-2/80 p-6 backdrop-blur-md md:mt-0 md:p-7"
-              >
+              <Reveal delay={0.08} className="mt-6 rounded-3xl border border-line bg-bg-2/95 p-6 md:mt-0 md:p-7">
                 <Award className="text-accent" size={22} aria-hidden />
                 <p className="mt-5 label">Sertifikalar</p>
                 <ul className="mt-4 space-y-3">

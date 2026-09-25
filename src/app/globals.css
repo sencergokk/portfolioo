@@ -44,7 +44,7 @@
 
 @theme inline {
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
@@ -122,6 +122,12 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  /* background-clip:text only paints inside the box; with tight line-heights accents and
+     descenders fall outside it. Pad the paint area and pull the layout back. */
+  padding: 0.2em 0.06em;
+  margin: -0.2em -0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 @utility container-page {
@@ -137,10 +143,9 @@
   }
 }
 
+/* No backdrop-filter on purpose: blurring a live WebGL canvas forces a re-blur every frame. */
 @utility glass {
-  background: linear-gradient(180deg, rgb(20 20 24 / 0.72), rgb(12 12 15 / 0.62));
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  background: linear-gradient(180deg, rgb(22 22 26 / 0.9), rgb(14 14 17 / 0.86));
   border: 1px solid var(--color-line);
 }
 
@@ -148,7 +153,7 @@
 .grain::after {
   content: "";
   position: fixed;
-  inset: -50%;
+  inset: 0;
   z-index: 60;
   pointer-events: none;
   opacity: 0.05;

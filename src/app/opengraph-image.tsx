@@ -9,9 +9,9 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Read once at module scope; these never depend on the request.
-const [geist, instrument, portrait] = await Promise.all([
+const [geist, display, portrait] = await Promise.all([
   readFile(join(process.cwd(), "assets/fonts/Geist-Medium.ttf")),
-  readFile(join(process.cwd(), "assets/fonts/InstrumentSerif-Italic.ttf")),
+  readFile(join(process.cwd(), "assets/fonts/PlayfairDisplay-Regular.ttf")),
   readFile(join(process.cwd(), "public/images/sencer-portrait.png"), "base64"),
 ]);
 
@@ -77,7 +77,7 @@ export default async function OpengraphImage() {
           <div style={{ fontSize: 136, lineHeight: 0.9, letterSpacing: -7 }}>{site.firstName}</div>
           <div
             style={{
-              fontFamily: "Instrument Serif",
+              fontFamily: "Playfair Display",
               fontSize: 150,
               lineHeight: 0.95,
               color: "#e8b86b",
@@ -88,7 +88,7 @@ export default async function OpengraphImage() {
             {`${site.lastName}.`}
           </div>
         </div>
-        <div style={{ fontFamily: "Instrument Serif", fontSize: 42, marginTop: 20 }}>{site.role}</div>
+        <div style={{ fontFamily: "Playfair Display", fontSize: 42, marginTop: 20 }}>{site.role}</div>
         <div
           style={{ display: "flex", alignItems: "center", gap: 14, marginTop: "auto", fontSize: 22, color: "#bcb6aa" }}
         >
@@ -114,7 +114,7 @@ export default async function OpengraphImage() {
       ...size,
       fonts: [
         { name: "Geist", data: geist, style: "normal", weight: 500 },
-        { name: "Instrument Serif", data: instrument, style: "italic", weight: 400 },
+        { name: "Playfair Display", data: display, style: "normal", weight: 400 },
       ],
     },
   );

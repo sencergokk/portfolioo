@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-const instrument = await readFile(join(process.cwd(), "assets/fonts/InstrumentSerif-Italic.ttf"));
+const display = await readFile(join(process.cwd(), "assets/fonts/PlayfairDisplay-Regular.ttf"));
 
 export default function AppleIcon() {
   return new ImageResponse(
@@ -18,13 +18,13 @@ export default function AppleIcon() {
         justifyContent: "center",
         background: "radial-gradient(circle at 50% 35%, #1d1a14, #070708 70%)",
         color: "#e8b86b",
-        fontFamily: "Instrument Serif",
+        fontFamily: "Playfair Display",
         fontSize: 132,
         paddingBottom: 10,
       }}
     >
       S
     </div>,
-    { ...size, fonts: [{ name: "Instrument Serif", data: instrument, style: "italic", weight: 400 }] },
+    { ...size, fonts: [{ name: "Playfair Display", data: display, style: "normal", weight: 400 }] },
   );
 }

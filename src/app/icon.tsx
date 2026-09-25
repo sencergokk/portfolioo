@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-const instrument = await readFile(join(process.cwd(), "assets/fonts/InstrumentSerif-Italic.ttf"));
+const display = await readFile(join(process.cwd(), "assets/fonts/PlayfairDisplay-Regular.ttf"));
 
 /** Monogram favicon — same gold serif "S" as the nav mark. */
 export default function Icon() {
@@ -21,13 +21,13 @@ export default function Icon() {
         background: "#0c0c0f",
         border: "2px solid rgba(232,184,107,0.45)",
         color: "#e8b86b",
-        fontFamily: "Instrument Serif",
+        fontFamily: "Playfair Display",
         fontSize: 50,
         paddingBottom: 4,
       }}
     >
       S
     </div>,
-    { ...size, fonts: [{ name: "Instrument Serif", data: instrument, style: "italic", weight: 400 }] },
+    { ...size, fonts: [{ name: "Playfair Display", data: display, style: "normal", weight: 400 }] },
   );
 }

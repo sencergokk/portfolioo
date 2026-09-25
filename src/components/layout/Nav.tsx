@@ -56,13 +56,13 @@ export function Nav() {
         <div
           className={cn(
             "absolute inset-0 -z-10 transition-opacity duration-500",
-            "bg-gradient-to-b from-bg/90 via-bg/60 to-transparent backdrop-blur-[2px]",
+            "bg-gradient-to-b from-bg/95 via-bg/70 to-transparent",
             scrolled ? "opacity-100" : "opacity-0",
           )}
         />
         <nav aria-label="Ana menü" className="container-page flex h-[72px] items-center justify-between gap-6">
           <a href="#top" className="group flex items-center gap-3" aria-label={`${site.name} — başa dön`}>
-            <span className="relative grid h-9 w-9 place-items-center rounded-full border border-line-strong bg-bg-2 font-serif text-lg text-accent italic transition-colors group-hover:border-accent/60">
+            <span className="relative grid h-9 w-9 place-items-center rounded-full border border-line-strong bg-bg-2 font-serif text-lg text-accent transition-colors group-hover:border-accent/60">
               S
             </span>
             <span className="hidden text-sm leading-tight sm:block">
@@ -136,7 +136,7 @@ export function Nav() {
             role="dialog"
             aria-modal="true"
             aria-label="Menü"
-            className="fixed inset-0 z-40 flex flex-col bg-bg/95 px-5 pt-28 pb-10 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-40 flex flex-col bg-bg/[0.98] px-5 pt-28 pb-10 md:hidden"
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}
@@ -160,7 +160,7 @@ export function Nav() {
               ))}
             </ul>
             <div className="mt-auto space-y-6">
-              <a href={`mailto:${site.email}`} className="block font-serif text-2xl text-fg italic">
+              <a href={`mailto:${site.email}`} className="block font-serif text-2xl text-fg">
                 {site.email}
               </a>
               <div className="flex gap-3">

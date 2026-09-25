@@ -5,7 +5,8 @@ Sayfanın merkezinde, scroll ile şekil değiştiren GPU tabanlı bir parçacık
 
 **portre → iPhone ana ekranı → galaksi**
 
-- **Hero** — fotoğraftan örneklenen ~28K parçacıklık 3B portre; imleç parçacıkları iter, sahne fareyle hafifçe döner.
+- **Hero** — fotoğraftan örneklenen ~30K parçacıklık 3B portre; parçacıklar hafifçe parlar, portrenin üzerinden periyodik
+  bir ışık taraması geçer, imleç parçacıkları iter ve sahne scroll hızına tepki verir.
 - **Uygulamalar** — parçacıklar bir iPhone silüetine dönüşür (ikon renkleri uygulamaların renkleri). Ardından 4 öne çıkan
   uygulama yapışkan, üst üste binen kartlarda; her biri için elle kurulmuş, görselsiz UI mock'ları ve Halı Saha
   Tycoon'un gerçek mağaza ekranları. Altında 14 uygulamalık katalog ve imleci takip eden ikon önizlemesi.
@@ -18,7 +19,7 @@ Sayfanın merkezinde, scroll ile şekil değiştiren GPU tabanlı bir parçacık
 | Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript (strict)            |
 | 3B        | three.js + @react-three/fiber, özel GLSL vertex/fragment shader              |
 | Animasyon | motion (Framer Motion), Lenis (smooth scroll)                                |
-| Stil      | Tailwind CSS v4 (`@theme` token'ları), next/font (Geist, Instrument Serif)   |
+| Stil      | Tailwind CSS v4 (`@theme` token'ları), next/font (Geist, Playfair Display)   |
 | SEO       | Metadata API, JSON-LD `Person`, dinamik OG görseli, sitemap, robots, ikonlar |
 
 ## Geliştirme
@@ -36,12 +37,15 @@ Node.js ≥ 20.9 gerekir. Vercel'e ek ayar olmadan deploy edilir.
 
 Bileşenlere dokunmadan, tüm metinler `src/content/` altında:
 
-| Dosya           | İçerik                                                             |
-| --------------- | ------------------------------------------------------------------ |
-| `site.ts`       | isim, unvan, iletişim, sosyal linkler, hakkımda, istatistikler     |
-| `apps.ts`       | öne çıkan 4 uygulama + 14 uygulamalık katalog (App Store linkleri) |
-| `experience.ts` | iş deneyimi, eğitim, sertifikalar                                  |
-| `stack.ts`      | yetkinlik grupları ve kayan yazı bandı                             |
+| Dosya           | İçerik                                                                |
+| --------------- | --------------------------------------------------------------------- |
+| `site.ts`       | isim, unvan, iletişim, sosyal linkler, özgeçmiş yolu                  |
+| `about.ts`      | hakkımda metni, istatistikler (uygulama sayısı katalogdan hesaplanır) |
+| `apps.ts`       | öne çıkan 4 uygulama + tüm katalog (App Store linkleri)               |
+| `experience.ts` | iş deneyimi, eğitim, sertifikalar (işveren adı bilinçli olarak yok)   |
+| `stack.ts`      | yetkinlik grupları ve kayan yazı bandı                                |
+
+Özgeçmiş `public/Sencer-Gok-CV.pdf` olarak sunulur; güncellemek için dosyayı değiştirmek yeterli.
 
 Yeni bir öne çıkan uygulama eklemek için `featuredApps`'e kayıt ekleyip `components/mocks/AppMocks.tsx` içinde bir görsel
 bileşeni yazmak ve `Apps.tsx`'teki `VISUALS` tablosuna bağlamak yeterli.
@@ -71,22 +75,28 @@ src/
 │   └── ui/          Reveal/SplitText/Magnetic/Counter, PhoneFrame, AppGlyph, ikonlar
 └── scene/
     ├── shapes.ts        deterministik nokta bulutları (portre, telefon, galaksi)
+    ├── shapes.worker.ts şekilleri Web Worker'da üretir (typed array transfer)
     ├── shaders.ts       morph + girdap + imleç etkileşimi (tek draw call)
     ├── director.ts      DOM'daki `data-scene` çapalarından scroll'a bağlı sahne durumu
-    ├── ParticleCanvas   R3F canvas, adaptif DPR
+    ├── ParticleCanvas   R3F canvas, adaptif kalite (DPR + parçacık bütçesi)
     └── SceneLayer       lazy-load, WebGL tespiti, CSS fallback
 ```
 
 - **Sahne koreografisi deklaratif.** Bölümler `data-scene="apps"` gibi çapalar bırakır; `SceneDirector` hangi çapanın
   ekranın ortasında olduğuna göre durumu (şekil, konum, ölçek, parlaklık) enterpolasyonla hesaplar. Bölüm sırası
   değişse bile WebGL koduna dokunmak gerekmez.
-- **Performans.** three.js ana bundle'da değil (`next/dynamic`, `ssr: false`); tüm animasyon GPU'da, kare başına
-  sıfır allocation. Mobilde ve ≤4 çekirdekli cihazlarda parçacık sayısı yarıya iner, ilk 2 saniye yavaş geçerse DPR
-  1'e düşürülür. WebGL yoksa sayfa CSS arka planıyla tam çalışır.
+- **Performans.**
+  - three.js ana bundle'da değil (`next/dynamic`, `ssr: false`); nokta bulutları Web Worker'da üretilir, ana thread
+    hiç bloklanmaz. Tüm animasyon GPU'da, kare başına sıfır allocation.
+  - Adaptif kalite: kare süresi sürekli ölçülür; yavaşlık sürerse önce DPR (1.5 → 1.25 → 1), sonra çizilen parçacık
+    sayısı kademeli düşer. Sahne içeriğin arkasında sönükken zaten daha az parçacık çizilir.
+  - Canlı WebGL tuvalinin üstünde `backdrop-filter` ve `filter: blur` animasyonu kullanılmaz (her karede yeniden
+    hesaplanırlar); reveal animasyonları yalnızca `transform` + `opacity`.
+  - Mobilde ve ≤4 çekirdekli cihazlarda parçacık sayısı yarıya iner. WebGL yoksa sayfa CSS arka planıyla tam çalışır.
 - **Erişilebilirlik.** Semantik başlık hiyerarşisi, "içeriğe geç" linki, klavye odak stilleri, animasyonlu metinlerde
   ekran okuyucu için düz metin, `prefers-reduced-motion` desteği (Lenis, motion ve shader zamanı durur).
 
 ## Lisanslar
 
-`assets/fonts/` altındaki Geist ve Instrument Serif fontları SIL Open Font License 1.1 ile dağıtılır ve yalnızca
+`assets/fonts/` altındaki Geist ve Playfair Display fontları SIL Open Font License 1.1 ile dağıtılır ve yalnızca
 OG görseli/ikon üretiminde kullanılır.

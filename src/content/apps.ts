@@ -1,7 +1,8 @@
 import { socials } from "./site";
 
 const developerPage = socials.appStore.href;
-const store = (id: string) => `https://apps.apple.com/tr/app/id${id}`;
+/** Region-less App Store link — Apple redirects to the visitor's own storefront. */
+const store = (id: string) => `https://apps.apple.com/app/id${id}`;
 
 /** Glyph keys resolved to icons in `components/ui/AppGlyph.tsx` — keeps content free of UI imports. */
 export type GlyphKey =
@@ -18,6 +19,7 @@ export type GlyphKey =
   | "moon"
   | "scissors"
   | "languages"
+  | "graduation"
   | "library";
 
 export type Accent = {
@@ -84,12 +86,12 @@ export const featuredApps: readonly FeaturedApp[] = [
     platforms: ["iOS", "Android"],
     tagline: "KPSS hazırlığı; cebinde ve kulağında.",
     description:
-      "Sesli ders notları, binlerce güncel soru, boşluk doldurma alıştırmaları ve oyunlaştırılmış içeriklerle KPSS'ye hazırlanmayı kolaylaştıran abonelikli eğitim platformu. Supabase altyapısı ve Telegram botuyla App Store ve Google Play'de yayında.",
+      "Soru bankası, sesli dersler, deneme testleri, ilerleme takibi, kaydedilen sorular ve Pomodoro çalışma sistemiyle KPSS'ye hazırlanmayı kolaylaştıran abonelikli eğitim platformu. Supabase altyapısıyla App Store ve Google Play'de yayında.",
     highlights: [
+      "Soru bankası ve deneme testleri",
+      "Arka planda çalan sesli dersler",
+      "Pomodoro çalışma sistemi ve ilerleme takibi",
       "Silver · Gold · Platinum abonelik",
-      "Arka planda çalan sesli ders notları",
-      "İnternetsiz soru çözme",
-      "Telegram botu entegrasyonu",
     ],
     stack: ["SwiftUI", "Flutter", "Supabase", "Abonelik", "Telegram Bot"],
     href: store("6746972924"),
@@ -105,15 +107,15 @@ export const featuredApps: readonly FeaturedApp[] = [
     year: "2026",
     tagline: "Telefonun izinsiz kıpırdadığı an alarm çalar.",
     description:
-      "İvmeölçer, şarj durumu ve yakınlık sensörünü yalnızca koruma modu açıkken, tamamen cihaz üzerinde okuyarak telefonu hırsızlığa karşı koruyan güvenlik uygulaması. Hesap yok, reklam yok; anonim kullanım analitiği kendi Supabase sunucumda.",
+      "Cihazın hareket ettirilmesini, şarj kablosunun çekilmesini ve cepten çıkarılmasını algılayıp alarm çalan güvenlik uygulaması. Sensörler yalnızca koruma modu açıkken ve tamamen cihaz üzerinde okunur; hesap yok, reklam yok.",
     highlights: [
       "Hareket, şarj ve cep koruma modları",
+      "Ayarlanabilir hassasiyet",
       "PIN ile susturulan alarm",
-      "Sensör verisi cihazdan hiç çıkmaz",
-      "Gizlilik odaklı, kendi sunucumda analitik",
+      "Tamamen çevrimdışı çalışır",
     ],
     stack: ["SwiftUI", "Core Motion", "StoreKit", "Supabase"],
-    href: developerPage,
+    href: store("6787492253"),
     accent: { from: "#f59e0b", to: "#ef4444" },
     visual: "theft",
   },
@@ -150,21 +152,30 @@ export const catalog: readonly CatalogApp[] = [
     slug: "theft-alarm",
     name: "Theft Alarm: Anti-Theft Guard",
     category: "Araçlar",
-    blurb: "Sensörlerle çalışan, gizlilik odaklı hırsızlık alarmı.",
+    blurb: "Hareket, şarj ve cep algılayan, çevrimdışı hırsızlık alarmı.",
     glyph: "shield",
     accent: { from: "#f59e0b", to: "#ef4444" },
-    href: developerPage,
+    href: store("6787492253"),
     featured: true,
   },
   {
     slug: "kpss-go",
     name: "KPSS GO: Soru ve Konu Anlatım",
     category: "Eğitim",
-    blurb: "Sesli dersler ve soru bankasıyla abonelikli KPSS platformu.",
+    blurb: "Soru bankası, sesli dersler ve Pomodoro ile abonelikli KPSS platformu.",
     glyph: "book",
     accent: { from: "#4f7cff", to: "#9b8cff" },
     href: store("6746972924"),
     featured: true,
+  },
+  {
+    slug: "ingilizce-ogren",
+    name: "İngilizce Öğren Pratik Yap",
+    category: "Eğitim",
+    blurb: "A1'den C2'ye oyunlaştırılmış kelime ve günlük İngilizce pratiği.",
+    glyph: "languages",
+    accent: { from: "#22c55e", to: "#0ea5e9" },
+    href: store("6778374680"),
   },
   {
     slug: "masalai",
@@ -178,9 +189,9 @@ export const catalog: readonly CatalogApp[] = [
   },
   {
     slug: "cooka",
-    name: "Cooka",
+    name: "Cooka – AI Recipe Generator",
     category: "Yemek & İçecek",
-    blurb: "Elindeki malzemelerden adım adım tarif üreten mutfak asistanı.",
+    blurb: "Elindeki malzemelerden yapay zekâ ile kişisel, adım adım tarifler.",
     glyph: "chef",
     accent: { from: "#fb923c", to: "#f43f5e" },
     href: store("6738347469"),
@@ -189,37 +200,37 @@ export const catalog: readonly CatalogApp[] = [
     slug: "notishine",
     name: "Notishine",
     category: "Yaşam Tarzı",
-    blurb: "Güne iyi hissettiren, kişiselleştirilmiş pozitif bildirimler.",
+    blurb: "Aktif saatlerine göre planlanan, kişiselleştirilmiş motivasyon bildirimleri.",
     glyph: "sun",
     accent: { from: "#facc15", to: "#fb923c" },
     href: store("6742649551"),
   },
   {
-    slug: "ehliyetbox",
-    name: "EhliyetBox: Ehliyet Sınav Soru",
-    category: "Eğitim",
-    blurb: "Firebase destekli güncel soru bankasıyla ehliyet sınavı hazırlığı.",
-    glyph: "car",
-    accent: { from: "#f97316", to: "#dc2626" },
-    href: developerPage,
+    slug: "sleep-sounds-plus",
+    name: "Sleep Sounds Plus: Brown Noise",
+    category: "Sağlık & Fitness",
+    blurb: "Kahverengi, beyaz ve pembe gürültüyü yağmur ve fan sesleriyle karıştıran uyku mikseri.",
+    glyph: "moon",
+    accent: { from: "#6366f1", to: "#1e1b4b" },
+    href: store("6792748576"),
   },
   {
     slug: "medication-tracking",
     name: "Medication Tracking & Reminder",
     category: "Sağlık",
-    blurb: "Kritik ilaçları öncelik seviyesiyle takip eden hatırlatıcı.",
+    blurb: "Doz, sıklık ve önceliğe göre tekrarlayan ilaç hatırlatıcıları.",
     glyph: "pill",
     accent: { from: "#14b8a6", to: "#22c55e" },
-    href: developerPage,
+    href: store("6745835442"),
   },
   {
     slug: "speaker-cleaner-water-remover",
     name: "Speaker Cleaner Water Remover",
     category: "Araçlar",
-    blurb: "Ses ve titreşim frekanslarıyla hoparlördeki suyu dışarı atar.",
+    blurb: "Ses frekansı ve titreşimle hoparlördeki nemi ve tozu dışarı atar.",
     glyph: "droplets",
     accent: { from: "#22d3ee", to: "#3b82f6" },
-    href: developerPage,
+    href: store("6746083491"),
   },
   {
     slug: "speaker-cleaner-get-water-out",
@@ -231,12 +242,12 @@ export const catalog: readonly CatalogApp[] = [
     href: developerPage,
   },
   {
-    slug: "sleep-sounds-plus",
-    name: "Sleep Sounds Plus: Brown Noise",
-    category: "Sağlık & Fitness",
-    blurb: "Kahverengi gürültü ve ortam sesleriyle uyku ve odak.",
-    glyph: "moon",
-    accent: { from: "#6366f1", to: "#1e1b4b" },
+    slug: "ehliyetbox",
+    name: "EhliyetBox: Ehliyet Sınav Soru",
+    category: "Eğitim",
+    blurb: "Firebase destekli güncel soru bankasıyla ehliyet sınavı hazırlığı.",
+    glyph: "car",
+    accent: { from: "#f97316", to: "#dc2626" },
     href: developerPage,
   },
   {
@@ -253,7 +264,7 @@ export const catalog: readonly CatalogApp[] = [
     name: "YDS Sınav Soruları",
     category: "Eğitim",
     blurb: "YDS'ye hazırlananlar için konu bazlı soru bankası.",
-    glyph: "languages",
+    glyph: "graduation",
     accent: { from: "#0ea5e9", to: "#8b5cf6" },
     href: developerPage,
   },

@@ -38,7 +38,7 @@ export function Contact() {
         <Reveal delay={0.3} className="mt-12 flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
           <a
             href={`mailto:${site.email}`}
-            className="group relative w-fit font-serif text-[clamp(1.75rem,4.4vw,3.75rem)] leading-none text-fg italic"
+            className="group relative w-fit font-serif text-[clamp(1.6rem,4vw,3.4rem)] leading-tight tracking-[-0.02em] text-fg"
           >
             {site.email}
             <span

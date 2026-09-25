@@ -93,7 +93,7 @@ function samplePortrait(map: ImageData, count: number, rng: Rng, out: ShapeBuffe
       const edge = data[i + 2] / 255;
       // Dark features (hair, beard) keep a base density so the silhouette survives;
       // edges are boosted so eyes, brows and the beard line stay legible.
-      const w = Math.pow(mask, 1.5) * (0.13 + 0.8 * Math.pow(lum, 1.15) + 1.0 * edge) * bottomFade * sideFade;
+      const w = Math.pow(mask, 1.5) * (0.11 + 0.85 * Math.pow(lum, 1.25) + 1.25 * edge) * bottomFade * sideFade;
       total += w;
       weights[y * W + x] = total;
     }

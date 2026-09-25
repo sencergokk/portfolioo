@@ -65,7 +65,7 @@ export function HaliSahaVisual() {
           />
         </div>
       ))}
-      <div className="absolute bottom-3 left-4 z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/60 p-2 pr-4 backdrop-blur-md md:bottom-6 md:left-6">
+      <div className="absolute bottom-3 left-4 z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/80 p-2 pr-4 md:bottom-6 md:left-6">
         <Image
           src="/apps/halisaha-icon.png"
           alt="Halı Saha Tycoon uygulama ikonu"
@@ -249,7 +249,7 @@ export function MasalVisual() {
         </div>
 
         <p className="mt-4 text-[10px] tracking-[0.18em] text-fuchsia-200/70 uppercase">Bölüm 1 · 6 dk</p>
-        <p className="mt-1 font-serif text-[20px] leading-tight italic">Ay Işığındaki Tilki</p>
+        <p className="mt-1 font-serif text-[19px] leading-tight">Ay Işığındaki Tilki</p>
         <p className="mt-2 text-[11.5px] leading-relaxed text-white/70">
           Ormanın en sessiz köşesinde, her gece ay ışığını minik bir kavanoza toplayan meraklı bir tilki yaşarmış…
         </p>

@@ -3,6 +3,7 @@ import {
   Car,
   ChefHat,
   Droplets,
+  GraduationCap,
   Languages,
   Library,
   Moon,
@@ -33,6 +34,7 @@ const GLYPHS: Record<GlyphKey, LucideIcon> = {
   moon: Moon,
   scissors: Scissors,
   languages: Languages,
+  graduation: GraduationCap,
   library: Library,
 };
 

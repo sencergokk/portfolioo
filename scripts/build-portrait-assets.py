@@ -30,6 +30,20 @@ ROOT = Path(__file__).resolve().parents[1]
 MAP_SIZE = 200
 
 
+# Blend of histogram-equalised and original luminance for the particle map. Equalising over the
+# subject only lifts the shadow side of a low-key selfie so both halves of the face read as particles.
+EQUALIZE_MIX = 0.28
+
+
+def equalize_subject(lum: np.ndarray, mask: np.ndarray, mix: float) -> np.ndarray:
+    inside = mask > 0.5
+    values = np.sort(lum[inside])
+    if values.size == 0 or mix <= 0:
+        return lum
+    ranks = np.searchsorted(values, lum, side="right") / values.size
+    return np.clip(lum * (1 - mix) + ranks * mix, 0, 1)
+
+
 def subject_mask(photo: Image.Image) -> np.ndarray:
     session = new_session("u2net_human_seg")
     mask = remove(photo.convert("RGB"), session=session, only_mask=True)
@@ -78,6 +92,7 @@ def main() -> None:
     # 2) particle map
     lum = np.asarray(src.resize((MAP_SIZE, MAP_SIZE), Image.LANCZOS)).astype(np.float32) / 255
     m = np.asarray(mask_img.resize((MAP_SIZE, MAP_SIZE), Image.LANCZOS)).astype(np.float32) / 255
+    lum = equalize_subject(lum, m, EQUALIZE_MIX)
     blurred = (
         np.asarray(Image.fromarray((lum * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.7))).astype(np.float32)
         / 255

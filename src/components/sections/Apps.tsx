@@ -114,7 +114,7 @@ function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: numbe
     <article
       onPointerMove={onSpotlightMove}
       style={accentVars(app.accent.from, app.accent.to)}
-      className="spotlight grid overflow-hidden rounded-[32px] border border-line bg-bg-2/95 shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9)] backdrop-blur-xl md:min-h-[min(40rem,calc(100vh-8rem))] md:grid-cols-[1.05fr_1fr]"
+      className="spotlight grid overflow-hidden rounded-[32px] border border-line bg-bg-2 shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9)] md:min-h-[min(40rem,calc(100vh-8rem))] md:grid-cols-[1.05fr_1fr]"
     >
       <div className="flex flex-col p-6 sm:p-8 md:p-12">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -136,7 +136,7 @@ function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: numbe
         </h3>
         {app.storeName && <p className="mt-2 font-mono text-xs text-fg-3">App Store: {app.storeName}</p>}
         <p
-          className="mt-5 bg-clip-text font-serif text-2xl leading-snug text-transparent italic md:text-[1.75rem]"
+          className="mt-5 bg-clip-text py-[0.08em] font-serif text-2xl leading-snug tracking-[-0.015em] text-transparent md:text-[1.7rem]"
           style={{ backgroundImage: "linear-gradient(90deg, var(--a1), var(--a2))" }}
         >
           {app.tagline}

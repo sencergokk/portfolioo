@@ -6,7 +6,8 @@ import { useRef } from "react";
 import { Counter, Reveal, SplitText } from "@/components/ui/motion";
 import { SectionLabel, serifGold } from "@/components/ui/SectionHeading";
 import { education } from "@/content/experience";
-import { about, site } from "@/content/site";
+import { about } from "@/content/about";
+import { site } from "@/content/site";
 
 export function About() {
   const figure = useRef<HTMLDivElement>(null);
@@ -57,7 +58,7 @@ export function About() {
                 />
                 <figcaption className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4">
                   <div>
-                    <p className="font-serif text-3xl leading-none italic">{site.name}</p>
+                    <p className="font-serif text-3xl leading-tight tracking-[-0.02em]">{site.name}</p>
                     <p className="mt-2 label">{site.role}</p>
                   </div>
                   <p className="label text-right">

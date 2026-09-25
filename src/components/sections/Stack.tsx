@@ -1,11 +1,11 @@
-import { Code2, Layers, Server, Smartphone, type LucideIcon } from "lucide-react";
+import { Code2, Cpu, Layers, Server, Smartphone, type LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/ui/motion";
 import { SectionHeading, serifGold } from "@/components/ui/SectionHeading";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { marquee, stackGroups } from "@/content/stack";
 import { cn } from "@/lib/utils";
 
-const ICONS: Record<string, LucideIcon> = { mobil: Smartphone, web: Code2, backend: Server, arac: Layers };
+const ICONS: Record<string, LucideIcon> = { mobil: Smartphone, web: Code2, backend: Server, altyapi: Cpu };
 
 function MarqueeRow({ reverse = false }: { reverse?: boolean }) {
   const words = [...marquee, ...marquee];
@@ -23,7 +23,7 @@ function MarqueeRow({ reverse = false }: { reverse?: boolean }) {
               className={cn(
                 "text-[clamp(3rem,9vw,8.5rem)] leading-none whitespace-nowrap",
                 i % 2
-                  ? "font-serif text-fg-2 italic"
+                  ? "font-serif tracking-[-0.03em] text-fg-2"
                   : "font-medium tracking-[-0.05em] text-transparent [-webkit-text-stroke:1px_rgb(243_239_231/0.3)]",
               )}
             >
@@ -59,7 +59,7 @@ export function Stack() {
           const Icon = ICONS[g.id] ?? Layers;
           return (
             <Reveal key={g.id} delay={i * 0.07}>
-              <SpotlightCard className="flex h-full flex-col rounded-3xl border border-line bg-bg-2/85 p-6 backdrop-blur-md md:p-7">
+              <SpotlightCard className="flex h-full flex-col rounded-3xl border border-line bg-bg-2/95 p-6 md:p-7">
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-2xl border border-line-strong text-accent">
                     <Icon size={20} aria-hidden />

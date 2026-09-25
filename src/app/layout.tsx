@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { site, socials } from "@/content/site";
 import "./globals.css";
@@ -16,10 +16,9 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
-  weight: "400",
-  style: ["normal", "italic"],
+// Upright high-contrast display serif for accents (variable wght 400–900).
+const playfair = Playfair_Display({
+  variable: "--font-display",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
@@ -33,7 +32,7 @@ export const metadata: Metadata = {
   creator: site.name,
   keywords: [
     "Sencer Gök",
-    "yazılım mühendisi",
+    "full-stack geliştirici",
     "iOS geliştirici",
     "SwiftUI",
     "Next.js",
@@ -73,18 +72,28 @@ const personJsonLd = {
   name: site.name,
   url: site.url,
   image: `${site.url}${site.photo.full}`,
-  jobTitle: site.currentRole.title,
-  worksFor: { "@type": "Organization", name: "TEKNOPAR Endüstriyel Otomasyon" },
+  jobTitle: "Full-Stack & iOS Developer",
   alumniOf: { "@type": "CollegeOrUniversity", name: "Başkent Üniversitesi" },
   address: { "@type": "PostalAddress", addressLocality: "Ankara", addressCountry: "TR" },
   email: `mailto:${site.email}`,
   sameAs: [socials.github.href, socials.linkedin.href, socials.x.href, socials.appStore.href],
-  knowsAbout: ["SwiftUI", "iOS", "Next.js", "React", "TypeScript", "Java", "Spring Boot", "Supabase"],
+  knowsAbout: [
+    "SwiftUI",
+    "iOS",
+    "Java",
+    "Spring Boot",
+    "Next.js",
+    "React",
+    "TypeScript",
+    "PostgreSQL",
+    "Docker",
+    "LLM",
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="tr" className={`${geist.variable} ${geistMono.variable} ${instrument.variable}`}>
+    <html lang="tr" className={`${geist.variable} ${geistMono.variable} ${playfair.variable}`}>
       <body className="grain min-h-dvh">
         <script
           type="application/ld+json"
