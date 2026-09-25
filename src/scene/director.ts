@@ -8,7 +8,7 @@
  */
 
 export type SceneState = {
-  /** 0 = portrait, 1 = phone, 2 = galaxy (fractions blend). */
+  /** 0 = portrait, 1 = phone (fractions blend). */
   morph: number;
   /** Horizontal offset as a fraction of viewport width (0 = centre). */
   x: number;
@@ -20,24 +20,24 @@ export type SceneState = {
   alpha: number;
 };
 
-export type SceneKey = "hero" | "about" | "apps" | "apps-rest" | "experience" | "contact";
+export type SceneKey = "hero" | "about" | "principles" | "apps" | "apps-rest" | "off";
 
 const DESKTOP: Record<SceneKey, SceneState> = {
   hero: { morph: 0, x: 0.2, y: -0.04, scale: 0.9, alpha: 1 },
-  about: { morph: 0.5, x: -0.18, y: 0, scale: 1.05, alpha: 0.22 },
-  apps: { morph: 1, x: 0.24, y: -0.02, scale: 0.8, alpha: 1 },
-  "apps-rest": { morph: 1, x: 0.3, y: 0, scale: 0.75, alpha: 0.16 },
-  experience: { morph: 1.5, x: 0.15, y: 0, scale: 1.1, alpha: 0.2 },
-  contact: { morph: 2, x: 0.26, y: 0.04, scale: 1.05, alpha: 1 },
+  about: { morph: 0.35, x: -0.2, y: 0, scale: 1.05, alpha: 0.2 },
+  principles: { morph: 0.7, x: 0.2, y: 0, scale: 1, alpha: 0.12 },
+  apps: { morph: 1, x: 0.24, y: 0, scale: 0.8, alpha: 1 },
+  "apps-rest": { morph: 1, x: 0.3, y: 0, scale: 0.75, alpha: 0.14 },
+  off: { morph: 1, x: 0.3, y: 0, scale: 0.75, alpha: 0 },
 };
 
 const MOBILE: Record<SceneKey, SceneState> = {
-  hero: { morph: 0, x: 0, y: 0.235, scale: 0.47, alpha: 1 },
-  about: { morph: 0.5, x: 0, y: 0, scale: 0.8, alpha: 0.25 },
-  apps: { morph: 1, x: 0.18, y: 0.1, scale: 0.55, alpha: 0.5 },
-  "apps-rest": { morph: 1, x: 0.2, y: 0, scale: 0.55, alpha: 0.12 },
-  experience: { morph: 1.5, x: 0, y: 0, scale: 0.8, alpha: 0.15 },
-  contact: { morph: 2, x: 0.1, y: -0.22, scale: 0.75, alpha: 0.6 },
+  hero: { morph: 0, x: 0, y: 0.215, scale: 0.42, alpha: 1 },
+  about: { morph: 0.35, x: 0, y: 0, scale: 0.8, alpha: 0.14 },
+  principles: { morph: 0.7, x: 0, y: 0, scale: 0.8, alpha: 0.1 },
+  apps: { morph: 1, x: 0, y: 0.215, scale: 0.42, alpha: 1 },
+  "apps-rest": { morph: 1, x: 0.2, y: 0, scale: 0.5, alpha: 0.1 },
+  off: { morph: 1, x: 0.2, y: 0, scale: 0.5, alpha: 0 },
 };
 
 type Anchor = { key: SceneKey; scroll: number };

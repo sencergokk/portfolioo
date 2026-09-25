@@ -9,9 +9,11 @@ export const site = {
   firstName: "Sencer",
   lastName: "Gök",
   role: "Full-Stack & iOS Geliştirici",
-  title: "Sencer Gök — Full-Stack & iOS Geliştirici",
+  title: "Sencer Gök | Full-Stack & iOS Geliştirici",
   description:
-    "Ankara'da yaşayan full-stack ve bağımsız iOS geliştirici. Java, Spring Boot ve Next.js ile kurumsal MES/ERP yazılımları geliştiriyor; SwiftUI ile kendi uygulamalarını App Store'da yayınlıyor.",
+    "Ankara'da yaşayan full-stack ve iOS geliştirici. Java, Spring Boot ve Next.js ile kurumsal yazılımlar geliştiriyor, SwiftUI ile kendi uygulamalarını App Store'da yayınlıyor.",
+  intro:
+    "Java ve Spring Boot ile sağlam backend servisleri, Next.js ile hızlı web arayüzleri ve SwiftUI ile App Store'da yaşayan iOS uygulamaları geliştiriyorum.",
   locale: "tr_TR",
   location: "Ankara, Türkiye",
   timeZone: "Europe/Istanbul",

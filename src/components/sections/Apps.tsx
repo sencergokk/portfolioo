@@ -1,68 +1,68 @@
 "use client";
 
 import { ArrowUpRight, Check } from "lucide-react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-  type MotionStyle,
-  type MotionValue,
-} from "motion/react";
-import { useRef, useState, type PointerEvent, type ReactNode } from "react";
-import { HaliSahaVisual, KpssVisual, MasalVisual, TheftVisual } from "@/components/mocks/AppMocks";
+import { motion, useReducedMotion, useScroll, useTransform, type MotionStyle, type MotionValue } from "motion/react";
+import { useRef, type ComponentType, type ReactNode } from "react";
+import { HaliSahaVisual, KpssVisual, MasalVisual, MOCK_SIZE, TheftVisual } from "@/components/mocks/AppMocks";
 import { AppGlyph } from "@/components/ui/AppGlyph";
 import { AppleIcon } from "@/components/ui/icons";
-import { onSpotlightMove, Reveal } from "@/components/ui/motion";
-import { SectionHeading, serifGold } from "@/components/ui/SectionHeading";
-import { catalog, featuredApps, type CatalogApp, type FeaturedApp } from "@/content/apps";
+import { onSpotlightMove, Reveal, SplitText } from "@/components/ui/motion";
+import { ScaleToFit } from "@/components/ui/ScaleToFit";
+import { Section } from "@/components/ui/Section";
+import { SectionHeading, SectionLabel, serifGold } from "@/components/ui/SectionHeading";
+import { catalog, featuredApps, type FeaturedApp } from "@/content/apps";
 import { socials } from "@/content/site";
 import { accentVars } from "@/lib/utils";
 
-const VISUALS: Record<FeaturedApp["visual"], () => ReactNode> = {
-  halisaha: HaliSahaVisual,
-  kpss: KpssVisual,
-  theft: TheftVisual,
-  masal: MasalVisual,
+const VISUALS: Record<FeaturedApp["visual"], { Component: ComponentType; size: readonly [number, number] }> = {
+  halisaha: { Component: HaliSahaVisual, size: MOCK_SIZE.fan },
+  kpss: { Component: KpssVisual, size: MOCK_SIZE.phone },
+  theft: { Component: TheftVisual, size: MOCK_SIZE.phone },
+  masal: { Component: MasalVisual, size: MOCK_SIZE.phone },
 };
 
-export function Apps() {
+/* -------------------------------------------------------------------------- */
+/* Intro: the particle phone assembles beside (desktop) or above (mobile) it  */
+/* -------------------------------------------------------------------------- */
+
+export function AppsIntro() {
   return (
-    <section id="uygulamalar" className="relative pt-16 pb-28 md:pb-40">
-      {/* Intro — the particle phone assembles in the empty right half on desktop. */}
-      <div className="container-page relative flex min-h-[70svh] items-center md:min-h-[88svh]">
-        <div data-scene="apps" aria-hidden className="absolute top-1/2 left-0 h-px w-px" />
+    <Section id="uygulamalar" scene="apps">
+      <div className="container-page section-y flex flex-1 flex-col justify-end pt-[50svh] md:justify-center md:pt-[max(5.25rem,11svh)]">
         <SectionHeading
-          index="02"
+          index="03"
           label="Uygulamalar"
-          className="md:max-w-[52%]"
+          className="md:max-w-[50%]"
           title={[{ text: "Fikirden" }, { text: "App Store'a,", className: serifGold }, { text: "tek başıma." }]}
-          description={`Tasarım, kod, ekonomi dengesi, mağaza görselleri ve yerelleştirme — ${catalog.length} uygulamanın her aşamasını uçtan uca ben yürüttüm. Öne çıkan dördü:`}
+          description={`Tasarımdan koda, oyun ekonomisinden mağaza görsellerine kadar ${catalog.length} uygulamanın her aşamasını kendim yürüttüm. İşte öne çıkan dördü.`}
         />
       </div>
-
-      <FeaturedStack />
-
-      <AppIndex />
-    </section>
+    </Section>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Sticky stacking cards (desktop): each card pins, then recedes as the next  */
-/* one slides over it. On mobile the cards simply flow.                        */
+/* Featured apps: one screen per card; each pins, then recedes under the next */
 /* -------------------------------------------------------------------------- */
 
-function FeaturedStack() {
+export function FeaturedApps() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const total = featuredApps.length;
   return (
-    <div ref={ref} className="container-page relative">
-      <div data-scene="apps-rest" aria-hidden className="absolute top-0 left-0 h-px w-px" />
+    <div ref={ref} className="relative" aria-label="Öne çıkan uygulamalar">
+      {/* snap targets + scene anchors live outside the sticky cards so their positions stay static */}
+      {featuredApps.map((app, i) => (
+        <div
+          key={app.slug}
+          data-snap=""
+          aria-hidden
+          className="pointer-events-none absolute left-0 h-svh w-px"
+          style={{ top: `${i * 100}svh` }}
+        />
+      ))}
+      <div data-scene="apps-rest" aria-hidden className="pointer-events-none absolute top-[50svh] left-0 h-px w-px" />
+      <div data-scene="off" aria-hidden className="pointer-events-none absolute top-[150svh] left-0 h-px w-px" />
       {featuredApps.map((app, i) => (
         <StackItem key={app.slug} index={i} total={total} progress={scrollYProgress}>
           <FeaturedAppCard app={app} index={i} total={total} />
@@ -92,37 +92,63 @@ function StackItem({
   const dim = useTransform(progress, [start, Math.min(1, start + step)], [0, reduced || depth === 0 ? 0 : 0.6]);
 
   return (
-    <div className="mb-6 md:sticky md:top-0 md:mb-0 md:flex md:h-[100svh] md:items-center">
-      <motion.div
-        style={{ "--s": scale, top: `${index * 16}px` } as unknown as MotionStyle}
-        className="relative w-full origin-top md:[scale:var(--s)]"
-      >
-        {children}
+    <div
+      className="sticky top-0 flex h-svh flex-col"
+      style={{ paddingTop: `calc(max(4.75rem, 9svh) + ${index * 10}px)`, paddingBottom: "max(0.9rem, 3svh)" }}
+    >
+      <div className="container-page flex min-h-0 flex-1 flex-col">
         <motion.div
-          aria-hidden
-          style={{ opacity: dim }}
-          className="pointer-events-none absolute inset-0 hidden rounded-[32px] bg-bg md:block"
-        />
-      </motion.div>
+          style={{ "--s": scale } as unknown as MotionStyle}
+          className="relative min-h-0 flex-1 origin-top [scale:var(--s)]"
+        >
+          {children}
+          <motion.div
+            aria-hidden
+            style={{ opacity: dim }}
+            className="pointer-events-none absolute inset-0 rounded-[28px] bg-bg md:rounded-[32px]"
+          />
+        </motion.div>
+      </div>
     </div>
   );
 }
 
 function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: number; total: number }) {
-  const Visual = VISUALS[app.visual];
+  const { Component: Visual, size } = VISUALS[app.visual];
   return (
     <article
       onPointerMove={onSpotlightMove}
       style={accentVars(app.accent.from, app.accent.to)}
-      className="spotlight grid overflow-hidden rounded-[32px] border border-line bg-bg-2 shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9)] md:min-h-[min(40rem,calc(100vh-8rem))] md:grid-cols-[1.05fr_1fr]"
+      className="spotlight flex h-full flex-col overflow-hidden rounded-[28px] border border-line bg-bg-2 shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9)] md:grid md:grid-cols-[1.05fr_1fr] md:rounded-[32px]"
     >
-      <div className="flex flex-col p-6 sm:p-8 md:p-12">
+      {/* visual: top on phones, right on larger screens */}
+      <div className="relative order-1 min-h-0 flex-1 overflow-hidden border-b border-line md:order-2 md:border-b-0 md:border-l">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(60% 55% at 50% 45%, color-mix(in oklab, var(--a1) 32%, transparent), transparent 70%), radial-gradient(50% 40% at 80% 90%, color-mix(in oklab, var(--a2) 22%, transparent), transparent 70%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 [mask-image:radial-gradient(60%_60%_at_50%_50%,#000,transparent)] [background-image:radial-gradient(rgb(255_255_255/0.14)_1px,transparent_1px)] [background-size:22px_22px] opacity-30"
+        />
+        <div className="absolute inset-0 p-4 md:p-[clamp(1.25rem,4svh,2.5rem)]">
+          <ScaleToFit width={size[0]} height={size[1]}>
+            <Visual />
+          </ScaleToFit>
+        </div>
+      </div>
+
+      <div className="order-2 flex shrink-0 flex-col p-5 md:order-1 md:min-h-0 md:p-[clamp(1.5rem,4.6svh,3rem)]">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <span className="label text-accent tabular-nums">
             0{index + 1} / 0{total}
           </span>
           <span className="label">{app.category}</span>
-          <span className="flex gap-1.5">
+          <span className="hidden gap-1.5 md:flex">
             {app.platforms.map((p) => (
               <span key={p} className="rounded-full border border-line-strong px-2 py-0.5 text-[11px] text-fg-2">
                 {p}
@@ -131,21 +157,25 @@ function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: numbe
           </span>
         </div>
 
-        <h3 className="mt-8 text-[clamp(2.4rem,4.5vw,4rem)] leading-[0.95] font-medium tracking-[-0.045em]">
+        <h3 className="mt-2 text-[min(8.5vw,4.6svh)] leading-[1] font-medium tracking-[-0.045em] md:mt-[3svh] md:text-[clamp(2.2rem,min(4.2vw,6.4svh),4rem)]">
           {app.name}
         </h3>
-        {app.storeName && <p className="mt-2 font-mono text-xs text-fg-3">App Store: {app.storeName}</p>}
+        {app.storeName && (
+          <p className="mt-2 hidden font-mono text-xs text-fg-3 md:block short:md:hidden">App Store: {app.storeName}</p>
+        )}
         <p
-          className="mt-5 bg-clip-text py-[0.08em] font-serif text-2xl leading-snug tracking-[-0.015em] text-transparent md:text-[1.7rem]"
+          className="mt-1.5 bg-clip-text py-[0.08em] font-serif text-[1.05rem] leading-snug tracking-[-0.015em] text-transparent md:mt-[2svh] md:text-[clamp(1.2rem,2.8svh,1.7rem)]"
           style={{ backgroundImage: "linear-gradient(90deg, var(--a1), var(--a2))" }}
         >
           {app.tagline}
         </p>
-        <p className="mt-5 max-w-xl leading-relaxed text-pretty text-fg-2">{app.description}</p>
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-pretty text-fg-2 max-md:short:hidden md:mt-[2svh] md:line-clamp-3 md:text-[clamp(0.9rem,1.9svh,1rem)]">
+          {app.description}
+        </p>
 
-        <ul className="mt-7 grid gap-2.5 sm:grid-cols-2">
+        <ul className="mt-[2.6svh] hidden gap-2.5 md:grid md:grid-cols-2 short:md:hidden">
           {app.highlights.map((h) => (
-            <li key={h} className="flex items-start gap-2.5 text-sm text-fg">
+            <li key={h} className="flex items-start gap-2.5 text-[clamp(0.8rem,1.7svh,0.875rem)] text-fg">
               <span
                 className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full"
                 style={{ background: "color-mix(in oklab, var(--a1) 22%, transparent)", color: "var(--a1)" }}
@@ -157,8 +187,8 @@ function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: numbe
           ))}
         </ul>
 
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-6 pt-10">
-          <ul className="flex flex-wrap gap-1.5" aria-label="Teknolojiler">
+        <div className="mt-4 flex items-end justify-between gap-4 md:mt-auto md:pt-[3svh]">
+          <ul className="hidden flex-wrap gap-1.5 md:flex" aria-label="Teknolojiler">
             {app.stack.map((s) => (
               <li key={s} className="rounded-full bg-white/[0.05] px-3 py-1 font-mono text-[11px] text-fg-2">
                 {s}
@@ -169,7 +199,8 @@ function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: numbe
             href={app.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex h-11 items-center gap-2 rounded-full border border-line-strong pr-2 pl-4 text-sm transition-colors hover:border-transparent hover:bg-fg hover:text-bg"
+            aria-label={`${app.name} App Store sayfası`}
+            className="group inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-line-strong pr-2 pl-4 text-sm transition-colors hover:border-transparent hover:bg-fg hover:text-bg"
           >
             <AppleIcon className="h-4 w-4" />
             App Store
@@ -179,61 +210,34 @@ function FeaturedAppCard({ app, index, total }: { app: FeaturedApp; index: numbe
           </a>
         </div>
       </div>
-
-      <div className="group relative min-h-[30rem] overflow-hidden border-t border-line md:border-t-0 md:border-l">
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(60% 55% at 50% 45%, color-mix(in oklab, var(--a1) 32%, transparent), transparent 70%), radial-gradient(50% 40% at 80% 90%, color-mix(in oklab, var(--a2) 22%, transparent), transparent 70%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-30 [background-image:radial-gradient(rgb(255_255_255/0.14)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(60%_60%_at_50%_50%,#000,transparent)]"
-        />
-        <div className="relative flex h-full items-center justify-center p-6 md:p-10">
-          <Visual />
-        </div>
-      </div>
     </article>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Full catalogue with a cursor-following preview tile                        */
+/* Catalog: an iOS home screen on phones, a tile grid on larger screens       */
 /* -------------------------------------------------------------------------- */
 
-function AppIndex() {
-  const [hovered, setHovered] = useState<CatalogApp | null>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 260, damping: 26, mass: 0.5 });
-  const sy = useSpring(y, { stiffness: 260, damping: 26, mass: 0.5 });
-  const listRef = useRef<HTMLUListElement>(null);
-
-  const onMove = (e: PointerEvent) => {
-    const r = listRef.current?.getBoundingClientRect();
-    if (!r) return;
-    x.set(e.clientX - r.left);
-    y.set(e.clientY - r.top);
-  };
-
+export function Catalog() {
   return (
-    <div className="container-page mt-28 md:mt-40">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <Reveal>
-          <h3 className="text-[clamp(2rem,4vw,3.25rem)] leading-none font-medium tracking-[-0.04em]">
-            Tüm uygulamalar <sup className="ml-1 align-super font-mono text-base text-accent">{catalog.length}</sup>
-          </h3>
-        </Reveal>
-        <Reveal delay={0.1}>
+    <Section id="katalog" label="Tüm uygulamalar">
+      <div className="container-page section-y flex flex-1 flex-col justify-center">
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <Reveal>
+              <SectionLabel index="03">Tüm uygulamalar</SectionLabel>
+            </Reveal>
+            <SplitText
+              as="h2"
+              className="mt-3 text-[min(8.5vw,4.6svh)] leading-[1.05] font-medium tracking-[-0.04em] md:mt-[2.5svh] md:text-[clamp(2rem,min(4vw,6svh),3.4rem)]"
+              segments={[{ text: `${catalog.length} uygulama,` }, { text: "tek geliştirici.", className: serifGold }]}
+            />
+          </div>
           <a
             href={socials.appStore.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 text-sm text-fg-2 hover:text-fg"
+            className="group hidden items-center gap-2 text-sm text-fg-2 hover:text-fg md:inline-flex"
           >
             <AppleIcon className="h-4 w-4" /> Geliştirici sayfası
             <ArrowUpRight
@@ -241,86 +245,53 @@ function AppIndex() {
               className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             />
           </a>
-        </Reveal>
-      </div>
+        </div>
 
-      <ul
-        ref={listRef}
-        onPointerMove={onMove}
-        onPointerLeave={() => setHovered(null)}
-        className="relative mt-10 border-b border-line"
-      >
-        {catalog.map((app, i) => (
-          <Reveal as="li" key={app.slug} delay={Math.min(i, 6) * 0.04} amount={0.5}>
-            <a
-              href={app.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onPointerEnter={() => setHovered(app)}
-              onFocus={() => setHovered(null)}
-              className="group relative grid grid-cols-[2.25rem_auto_1fr_auto] items-center gap-x-4 border-t border-line py-4 md:grid-cols-[3.5rem_1fr_minmax(0,22rem)_9rem_2rem] md:gap-x-6 md:py-6"
-            >
-              <span
-                aria-hidden
-                className="absolute inset-0 origin-bottom scale-y-0 bg-[linear-gradient(90deg,transparent,rgb(243_239_231/0.04),transparent)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100"
-              />
-              <span className="label tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-              <AppGlyph glyph={app.glyph} accent={app.accent} icon={app.icon} size={40} className="md:hidden" />
-              <span className="flex min-w-0 items-center gap-3">
-                <span className="truncate text-lg font-medium tracking-[-0.02em] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2 md:text-[1.7rem]">
-                  {app.name}
+        <ul className="mt-5 grid grid-cols-4 gap-x-2 gap-y-[min(3.2svh,1.5rem)] md:mt-[3.5svh] md:grid-cols-5 md:gap-[min(1.8svh,1rem)]">
+          {catalog.map((app, i) => (
+            <Reveal as="li" key={app.slug} delay={Math.min(i, 10) * 0.03} amount={0.3}>
+              <a
+                href={app.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`${app.name}: ${app.blurb}`}
+                className="group flex h-full flex-col items-center text-center md:items-start md:rounded-2xl md:border md:border-line md:bg-bg-2/95 md:p-[clamp(0.7rem,1.9svh,1.25rem)] md:text-left md:transition-[border-color,transform] md:duration-500 md:hover:-translate-y-1 md:hover:border-line-strong"
+              >
+                <AppGlyph
+                  glyph={app.glyph}
+                  accent={app.accent}
+                  icon={app.icon}
+                  size={58}
+                  className="transition-transform duration-500 group-active:scale-95 short:[--g:50px] md:[--g:clamp(2.2rem,5.2svh,3rem)] md:short:[--g:clamp(2.2rem,5.2svh,3rem)]"
+                />
+                <span className="mt-1.5 line-clamp-1 w-full text-[11px] leading-tight text-fg-2 md:hidden">
+                  {app.shortName}
                 </span>
-                {app.featured && (
-                  <span className="hidden shrink-0 rounded-full border border-accent/40 px-2 py-0.5 text-[10px] tracking-wider text-accent uppercase lg:inline">
-                    Öne çıkan
+                <span className="mt-[1.4svh] hidden w-full items-start justify-between gap-2 md:flex">
+                  <span className="line-clamp-2 text-[clamp(0.8rem,1.8svh,0.95rem)] leading-snug font-medium tracking-tight">
+                    {app.name}
                   </span>
-                )}
-              </span>
-              <span className="hidden truncate text-sm text-fg-3 transition-colors group-hover:text-fg-2 md:block">
-                {app.blurb}
-              </span>
-              <span className="label hidden md:block">{app.category}</span>
-              <ArrowUpRight
-                size={18}
-                className="justify-self-end text-fg-3 transition-all duration-500 group-hover:rotate-45 group-hover:text-accent"
-                aria-hidden
-              />
-            </a>
-          </Reveal>
-        ))}
+                  <ArrowUpRight
+                    size={14}
+                    aria-hidden
+                    className="mt-0.5 shrink-0 text-fg-3 transition-all duration-500 group-hover:rotate-45 group-hover:text-accent"
+                  />
+                </span>
+                <span className="mt-1 hidden text-[11px] text-fg-3 md:block">{app.category}</span>
+              </a>
+            </Reveal>
+          ))}
+        </ul>
 
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              key="preview"
-              aria-hidden
-              className="pointer-events-none absolute top-0 left-0 z-10 hidden md:block"
-              style={{ x: sx, y: sy }}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.6 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="-translate-x-1/2 -translate-y-[115%]">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.div
-                    key={hovered.slug}
-                    initial={{ opacity: 0, rotate: -8, scale: 0.8 }}
-                    animate={{ opacity: 1, rotate: -4, scale: 1 }}
-                    exit={{ opacity: 0, rotate: 6, scale: 0.8 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <AppGlyph glyph={hovered.glyph} accent={hovered.accent} icon={hovered.icon} size={112} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </ul>
-      <p className="mt-6 text-sm text-fg-3">
-        Görseller temsilidir; her uygulamanın güncel hâli App Store sayfasındadır.
-      </p>
-    </div>
+        <a
+          href={socials.appStore.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-7 inline-flex items-center gap-2 self-center rounded-full border border-line-strong px-4 py-2.5 text-sm text-fg-2 short:mt-3 short:py-2 md:hidden"
+        >
+          <AppleIcon className="h-4 w-4" /> App Store geliştirici sayfası
+        </a>
+      </div>
+    </Section>
   );
 }

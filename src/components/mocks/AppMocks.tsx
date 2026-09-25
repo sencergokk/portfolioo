@@ -34,38 +34,38 @@ const Bars = ({ count = 28, className = "" }: { count?: number; className?: stri
 
 /* -------------------------------------------------------------------------- */
 
+/** Intrinsic sizes of the mocks; ScaleToFit scales them into the card. */
+export const MOCK_SIZE = { phone: [250, 542], fan: [560, 500] } as const;
+
 export function HaliSahaVisual() {
   const shots = [
     {
       src: "/apps/halisaha-upgrades.jpg",
       alt: "Halı Saha Tycoon yükseltmeler ekranı",
-      cls: "-rotate-[9deg] -translate-x-[62%] translate-y-6 group-hover:-translate-x-[74%] group-hover:-rotate-[12deg]",
+      cls: "-translate-x-[118%] translate-y-[-44%] -rotate-[9deg] group-hover:-translate-x-[130%] group-hover:-rotate-[12deg]",
     },
     {
       src: "/apps/halisaha-branches.jpg",
       alt: "Halı Saha Tycoon şubeler ekranı",
-      cls: "rotate-[9deg] translate-x-[62%] translate-y-6 group-hover:translate-x-[74%] group-hover:rotate-[12deg]",
+      cls: "translate-x-[18%] translate-y-[-44%] rotate-[9deg] group-hover:translate-x-[30%] group-hover:rotate-[12deg]",
     },
-    { src: "/apps/halisaha-pitch.jpg", alt: "Halı Saha Tycoon saha ekranı", cls: "z-10 group-hover:-translate-y-2" },
+    {
+      src: "/apps/halisaha-pitch.jpg",
+      alt: "Halı Saha Tycoon saha ekranı",
+      cls: "z-10 -translate-x-1/2 -translate-y-1/2 group-hover:-translate-y-[53%]",
+    },
   ];
   return (
-    <div className="relative flex h-full min-h-[26rem] w-full items-center justify-center">
+    <div className="group relative" style={{ width: MOCK_SIZE.fan[0], height: MOCK_SIZE.fan[1] }}>
       {shots.map((s) => (
         <div
           key={s.src}
-          className={`absolute w-[42%] max-w-[210px] overflow-hidden rounded-[22px] shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)] ring-1 ring-white/10 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${s.cls}`}
+          className={`absolute top-1/2 left-1/2 w-[200px] overflow-hidden rounded-[22px] shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)] ring-1 ring-white/10 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${s.cls}`}
         >
-          <Image
-            src={s.src}
-            alt={s.alt}
-            width={645}
-            height={1398}
-            sizes="(min-width: 768px) 210px, 40vw"
-            className="h-auto w-full"
-          />
+          <Image src={s.src} alt={s.alt} width={645} height={1398} sizes="220px" className="h-auto w-full" />
         </div>
       ))}
-      <div className="absolute bottom-3 left-4 z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/80 p-2 pr-4 md:bottom-6 md:left-6">
+      <div className="absolute bottom-0 left-2 z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/80 p-2 pr-4">
         <Image
           src="/apps/halisaha-icon.png"
           alt="Halı Saha Tycoon uygulama ikonu"

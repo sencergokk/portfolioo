@@ -42,6 +42,11 @@
   }
 }
 
+/* Height-aware variants: sections are sized to the viewport, so short screens need tighter layouts. */
+@custom-variant short (@media (max-height: 720px));
+@custom-variant tall (@media (min-height: 820px));
+@custom-variant xtall (@media (min-height: 940px));
+
 @theme inline {
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-display), ui-serif, Georgia, serif;
@@ -141,6 +146,12 @@
   @media (width >= 80rem) {
     padding-inline: 3.5rem;
   }
+}
+
+/* Every section fills exactly one screen; the top padding clears the fixed nav. */
+@utility section-y {
+  padding-top: max(5.25rem, 11svh);
+  padding-bottom: max(1.25rem, 5svh);
 }
 
 /* No backdrop-filter on purpose: blurring a live WebGL canvas forces a re-blur every frame. */
@@ -245,5 +256,19 @@
   50% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* Section snapping. Touch devices use native CSS snapping (Lenis leaves touch scrolling native);
+   mouse/trackpad snapping is handled by lenis/snap in SmoothScroll. */
+[data-snap] {
+  scroll-snap-align: start;
+}
+@media (pointer: coarse) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+  html.snap-off {
+    scroll-snap-type: none;
   }
 }

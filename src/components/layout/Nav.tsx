@@ -61,7 +61,7 @@ export function Nav() {
           )}
         />
         <nav aria-label="Ana menü" className="container-page flex h-[72px] items-center justify-between gap-6">
-          <a href="#top" className="group flex items-center gap-3" aria-label={`${site.name} — başa dön`}>
+          <a href="#top" className="group flex items-center gap-3" aria-label={`${site.name}, başa dön`}>
             <span className="relative grid h-9 w-9 place-items-center rounded-full border border-line-strong bg-bg-2 font-serif text-lg text-accent transition-colors group-hover:border-accent/60">
               S
             </span>

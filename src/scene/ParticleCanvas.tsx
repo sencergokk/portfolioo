@@ -55,6 +55,7 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
   });
   const target = useRef<SceneState>({ morph: 0, x: 0, y: 0, scale: 1, alpha: 1 });
   const perf = useRef({ level: 0, frames: 0, total: 0, slowWindows: 0, elapsed: 0 });
+  const cleared = useRef(false);
   const setDpr = useThree((s) => s.setDpr);
 
   const geometry = useMemo(() => {
@@ -62,13 +63,14 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
     g.setAttribute("position", new THREE.BufferAttribute(shapes.position, 3));
     g.setAttribute("aPortrait", new THREE.BufferAttribute(shapes.portrait, 3));
     g.setAttribute("aPhone", new THREE.BufferAttribute(shapes.phone, 3));
-    g.setAttribute("aGalaxy", new THREE.BufferAttribute(shapes.galaxy, 3));
     g.setAttribute("aScatter", new THREE.BufferAttribute(shapes.scatter, 3));
     g.setAttribute("aRnd", new THREE.BufferAttribute(shapes.rnd, 4));
     g.setAttribute("cPortrait", new THREE.BufferAttribute(shapes.cPortrait, 3));
     g.setAttribute("cPhone", new THREE.BufferAttribute(shapes.cPhone, 3));
-    g.setAttribute("cGalaxy", new THREE.BufferAttribute(shapes.cGalaxy, 3));
-    g.setAttribute("aSizes", new THREE.BufferAttribute(shapes.sizes, 3));
+    g.setAttribute("aSizes", new THREE.BufferAttribute(shapes.sizes, 2));
+    g.setAttribute("aKind", new THREE.BufferAttribute(shapes.kind, 1));
+    g.setAttribute("aMeta", new THREE.BufferAttribute(shapes.meta, 4));
+    g.setAttribute("aNormal", new THREE.BufferAttribute(shapes.normal, 3));
     // Positions are computed in the shader, so the static bounds are meaningless — never cull.
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 10);
     return g;
@@ -84,7 +86,6 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
       uSize: { value: 10 },
       uPixelRatio: { value: 1 },
       uAlpha: { value: 1 },
-      uTilt: { value: 0.95 },
       uMouse: { value: new THREE.Vector3(9, 9, 0) },
       uMouseStrength: { value: 0 },
       uScrollVel: { value: 0 },
@@ -151,12 +152,18 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
     s.mx = damp(s.mx, p.x, 9, dt);
     s.my = damp(s.my, p.y, 9, dt);
 
-    g.position.set(s.x * vw, s.y * vh, 0);
+    const time = u.uTime.value as number;
+    // 0 = portrait, 1 = phone: the phone floats and slowly turns so its titanium frame catches the light
+    const phone = smoothstep(0.55, 1, s.morph);
+    const idle = reducedMotion ? 0 : 1;
+    g.position.set(s.x * vw, s.y * vh + Math.sin(time * 0.8) * 0.012 * vh * phone * idle, 0);
     const k = s.scale * vh;
     g.scale.setScalar(k);
-    const time = u.uTime.value as number;
-    g.rotation.y = s.px * 0.22 + (reducedMotion ? 0 : Math.sin(time * 0.17) * 0.07);
-    g.rotation.x = -s.py * 0.1;
+    g.rotation.y =
+      s.px * (0.22 + 0.16 * phone) +
+      idle * (Math.sin(time * 0.17) * 0.07 * (1 - phone) + Math.sin(time * 0.42) * 0.34 * phone);
+    g.rotation.x = -s.py * 0.1 + idle * Math.sin(time * 0.31) * 0.06 * phone;
+    g.rotation.z = idle * Math.sin(time * 0.23) * 0.025 * phone;
 
     // cursor in the group's local space (rotation ignored — small angles)
     (u.uMouse.value as THREE.Vector3).set(
@@ -195,10 +202,19 @@ function Particles({ shapes, reducedMotion }: { shapes: ShapeBuffers; reducedMot
       }
     }
 
-    // When the scene is a dim backdrop behind content, draw fewer particles — nobody can tell.
+    // When the scene is a dim backdrop behind content, draw fewer particles; nobody can tell.
     const dim = 0.45 + 0.55 * smoothstep(0.12, 0.6, s.alpha);
     pts.geometry.setDrawRange(0, Math.floor(shapes.count * QUALITY[pf.level].budget * dim));
-  });
+
+    // Fully faded out (the lower sections): clear once, then stop drawing so the GPU idles.
+    if (s.alpha < 0.004 && t.alpha === 0) {
+      if (cleared.current) return;
+      cleared.current = true;
+    } else {
+      cleared.current = false;
+    }
+    state.gl.render(state.scene, state.camera);
+  }, 1);
 
   return (
     <group ref={group}>

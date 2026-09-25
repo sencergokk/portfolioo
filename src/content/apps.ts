@@ -47,6 +47,8 @@ export type FeaturedApp = {
 export type CatalogApp = {
   slug: string;
   name: string;
+  /** Home-screen style label used on the mobile grid. */
+  shortName: string;
   category: string;
   blurb: string;
   glyph: GlyphKey;
@@ -66,7 +68,7 @@ export const featuredApps: readonly FeaturedApp[] = [
     year: "2026",
     tagline: "Mahalle sahasından şehrin futbol imparatorluğuna.",
     description:
-      "Amcandan kalan yıpranmış bir halı sahayı devralıp şehrin futbol merkezine uzanan bir zincir kurduğun idle/tycoon oyunu. İzometrik saha sahnesi tamamen SwiftUI Canvas ile çiziliyor; oyun ekonomisi formülleri koruyan 87 birim testle güvence altında.",
+      "Amcandan kalan yıpranmış bir halı sahayı devralıp şehrin futbol merkezine uzanan bir zincir kurduğun idle tycoon oyunu. İzometrik saha sahnesi tamamen SwiftUI Canvas ile çiziliyor, oyun ekonomisi 87 birim testle güvence altında.",
     highlights: [
       "SwiftUI Canvas ile çizilen izometrik sahne",
       "87 birim testle korunan oyun ekonomisi",
@@ -84,7 +86,7 @@ export const featuredApps: readonly FeaturedApp[] = [
     storeName: "KPSS GO: Soru ve Konu Anlatım",
     category: "Eğitim",
     platforms: ["iOS", "Android"],
-    tagline: "KPSS hazırlığı; cebinde ve kulağında.",
+    tagline: "KPSS hazırlığı cebinde ve kulağında.",
     description:
       "Soru bankası, sesli dersler, deneme testleri, ilerleme takibi, kaydedilen sorular ve Pomodoro çalışma sistemiyle KPSS'ye hazırlanmayı kolaylaştıran abonelikli eğitim platformu. Supabase altyapısıyla App Store ve Google Play'de yayında.",
     highlights: [
@@ -107,7 +109,7 @@ export const featuredApps: readonly FeaturedApp[] = [
     year: "2026",
     tagline: "Telefonun izinsiz kıpırdadığı an alarm çalar.",
     description:
-      "Cihazın hareket ettirilmesini, şarj kablosunun çekilmesini ve cepten çıkarılmasını algılayıp alarm çalan güvenlik uygulaması. Sensörler yalnızca koruma modu açıkken ve tamamen cihaz üzerinde okunur; hesap yok, reklam yok.",
+      "Cihazın hareket ettirilmesini, şarj kablosunun çekilmesini ve cepten çıkarılmasını algılayıp alarm çalan güvenlik uygulaması. Sensörler yalnızca koruma modu açıkken ve tamamen cihaz üzerinde okunur. Hesap yok, reklam yok.",
     highlights: [
       "Hareket, şarj ve cep koruma modları",
       "Ayarlanabilir hassasiyet",
@@ -140,8 +142,9 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "halisaha-tycoon",
     name: "Soccer Field Tycoon: Idle Sim",
+    shortName: "Halı Saha",
     category: "Oyun",
-    blurb: "Halı sahadan futbol imparatorluğuna uzanan idle/tycoon oyunu.",
+    blurb: "Halı sahadan futbol imparatorluğuna uzanan idle tycoon oyunu.",
     glyph: "pitch",
     accent: { from: "#3f9b52", to: "#e8b86b" },
     href: developerPage,
@@ -151,6 +154,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "theft-alarm",
     name: "Theft Alarm: Anti-Theft Guard",
+    shortName: "Theft Alarm",
     category: "Araçlar",
     blurb: "Hareket, şarj ve cep algılayan, çevrimdışı hırsızlık alarmı.",
     glyph: "shield",
@@ -161,6 +165,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "kpss-go",
     name: "KPSS GO: Soru ve Konu Anlatım",
+    shortName: "KPSS GO",
     category: "Eğitim",
     blurb: "Soru bankası, sesli dersler ve Pomodoro ile abonelikli KPSS platformu.",
     glyph: "book",
@@ -171,6 +176,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "ingilizce-ogren",
     name: "İngilizce Öğren Pratik Yap",
+    shortName: "İngilizce",
     category: "Eğitim",
     blurb: "A1'den C2'ye oyunlaştırılmış kelime ve günlük İngilizce pratiği.",
     glyph: "languages",
@@ -180,6 +186,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "masalai",
     name: "MasalAI: Sonsuz Masal Deneyimi",
+    shortName: "MasalAI",
     category: "Kitap",
     blurb: "Yapay zekâ ile her gece yeni, sesli bir masal.",
     glyph: "sparkles",
@@ -189,7 +196,8 @@ export const catalog: readonly CatalogApp[] = [
   },
   {
     slug: "cooka",
-    name: "Cooka – AI Recipe Generator",
+    name: "Cooka",
+    shortName: "Cooka",
     category: "Yemek & İçecek",
     blurb: "Elindeki malzemelerden yapay zekâ ile kişisel, adım adım tarifler.",
     glyph: "chef",
@@ -199,6 +207,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "notishine",
     name: "Notishine",
+    shortName: "Notishine",
     category: "Yaşam Tarzı",
     blurb: "Aktif saatlerine göre planlanan, kişiselleştirilmiş motivasyon bildirimleri.",
     glyph: "sun",
@@ -208,6 +217,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "sleep-sounds-plus",
     name: "Sleep Sounds Plus: Brown Noise",
+    shortName: "Sleep Sounds",
     category: "Sağlık & Fitness",
     blurb: "Kahverengi, beyaz ve pembe gürültüyü yağmur ve fan sesleriyle karıştıran uyku mikseri.",
     glyph: "moon",
@@ -217,6 +227,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "medication-tracking",
     name: "Medication Tracking & Reminder",
+    shortName: "İlaç Takibi",
     category: "Sağlık",
     blurb: "Doz, sıklık ve önceliğe göre tekrarlayan ilaç hatırlatıcıları.",
     glyph: "pill",
@@ -226,6 +237,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "speaker-cleaner-water-remover",
     name: "Speaker Cleaner Water Remover",
+    shortName: "Cleaner",
     category: "Araçlar",
     blurb: "Ses frekansı ve titreşimle hoparlördeki nemi ve tozu dışarı atar.",
     glyph: "droplets",
@@ -235,6 +247,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "speaker-cleaner-get-water-out",
     name: "Speaker Cleaner: Get Water Out",
+    shortName: "Water Out",
     category: "Araçlar",
     blurb: "Tek dokunuşla frekans dalgalarıyla hoparlör temizliği.",
     glyph: "waves",
@@ -244,6 +257,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "ehliyetbox",
     name: "EhliyetBox: Ehliyet Sınav Soru",
+    shortName: "EhliyetBox",
     category: "Eğitim",
     blurb: "Firebase destekli güncel soru bankasıyla ehliyet sınavı hazırlığı.",
     glyph: "car",
@@ -253,6 +267,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "beauty-salon-tycoon",
     name: "Beauty Salon Tycoon: Idle",
+    shortName: "Beauty Salon",
     category: "Oyun",
     blurb: "Küçük bir salonu güzellik zincirine dönüştürdüğün idle oyun.",
     glyph: "scissors",
@@ -262,6 +277,7 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "yds",
     name: "YDS Sınav Soruları",
+    shortName: "YDS",
     category: "Eğitim",
     blurb: "YDS'ye hazırlananlar için konu bazlı soru bankası.",
     glyph: "graduation",
@@ -271,8 +287,9 @@ export const catalog: readonly CatalogApp[] = [
   {
     slug: "yazar-eser-ayt",
     name: "Yazar Eser AYT Edebiyat Kitabı",
+    shortName: "Yazar Eser",
     category: "Eğitim",
-    blurb: "AYT edebiyatında yazar–eser eşleştirmeleri için çalışma kitabı.",
+    blurb: "AYT edebiyatında yazar ve eser eşleştirmeleri için çalışma kitabı.",
     glyph: "library",
     accent: { from: "#eab308", to: "#b45309" },
     href: developerPage,

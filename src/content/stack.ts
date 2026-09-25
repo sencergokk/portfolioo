@@ -9,7 +9,7 @@ export const stackGroups: readonly StackGroup[] = [
   {
     id: "mobil",
     title: "Mobil",
-    summary: "Native iOS'ta SwiftUI; gerektiğinde çapraz platform. Mağaza, abonelik ve sürüm süreçleri dahil.",
+    summary: "Native iOS'ta SwiftUI, gerektiğinde çapraz platform. Mağaza, abonelik ve sürüm süreçleri dahil.",
     items: ["SwiftUI", "Swift", "StoreKit", "Core Motion", "React Native", "Flutter", "App Store Connect", "fastlane"],
   },
   {
@@ -21,7 +21,7 @@ export const stackGroups: readonly StackGroup[] = [
   {
     id: "backend",
     title: "Backend & Veri",
-    summary: "Spring Boot servisleri, REST/SOAP entegrasyonları, ilişkisel veritabanları ve MES–ERP veri akışları.",
+    summary: "Spring Boot servisleri, REST ve SOAP entegrasyonları, ilişkisel veritabanları ve ERP entegrasyonları.",
     items: ["Java", "Spring Boot", "REST API", "SOAP", "PostgreSQL", "SQL", "Supabase", "Firebase", "ERP entegrasyonu"],
   },
   {

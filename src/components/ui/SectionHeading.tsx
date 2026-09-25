@@ -11,17 +11,23 @@ export function SectionLabel({ index, children, className }: { index: string; ch
   );
 }
 
+/** Heading sizes follow the smaller of width and height, so every section fits one screen. */
+export const headingSize =
+  "text-[min(9.5vw,5.4svh)] leading-[1.02] font-medium tracking-[-0.045em] md:text-[clamp(2.4rem,min(5.8vw,8.6svh),5.5rem)]";
+
 export function SectionHeading({
   index,
   label,
   title,
   description,
+  descriptionClassName,
   className,
 }: {
   index: string;
   label: string;
   title: Segment[];
   description?: string;
+  descriptionClassName?: string;
   className?: string;
 }) {
   return (
@@ -29,14 +35,12 @@ export function SectionHeading({
       <Reveal>
         <SectionLabel index={index}>{label}</SectionLabel>
       </Reveal>
-      <SplitText
-        as="h2"
-        segments={title}
-        className="mt-6 text-[clamp(2.6rem,6.2vw,5.75rem)] leading-[0.98] font-medium tracking-[-0.045em] text-balance"
-      />
+      <SplitText as="h2" segments={title} className={cn("mt-4 text-balance md:mt-[3svh]", headingSize)} />
       {description && (
-        <Reveal delay={0.15}>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-fg-2 md:text-xl">{description}</p>
+        <Reveal delay={0.15} className={descriptionClassName}>
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-pretty text-fg-2 md:mt-[2.5svh] md:text-[clamp(1rem,2.2svh,1.25rem)]">
+            {description}
+          </p>
         </Reveal>
       )}
     </div>

@@ -1,16 +1,17 @@
-# sencergok.com — Portfolyo
+# sencergok.com: Portfolyo
 
-Sencer Gök'ün kişisel portfolyosu: **Next.js 16 + Three.js** ile yazılmış, tek sayfalık, karanlık temalı bir site.
-Sayfanın merkezinde, scroll ile şekil değiştiren GPU tabanlı bir parçacık sahnesi var:
+Sencer Gök'ün kişisel portfolyosu. **Next.js 16 + Three.js** ile yazılmış, tek sayfalık, karanlık temalı bir site.
+Her bölüm tam olarak bir ekran kaplar ve scroll bölümlere oturur. Arka planda scroll ile şekil değiştiren GPU tabanlı
+bir parçacık sahnesi var: **portre → iPhone ana ekranı**.
 
-**portre → iPhone ana ekranı → galaksi**
-
-- **Hero** — fotoğraftan örneklenen ~30K parçacıklık 3B portre; parçacıklar hafifçe parlar, portrenin üzerinden periyodik
+- **Hero:** fotoğraftan örneklenen ~30K parçacıklık 3B portre. Parçacıklar hafifçe parlar, portrenin üzerinden periyodik
   bir ışık taraması geçer, imleç parçacıkları iter ve sahne scroll hızına tepki verir.
-- **Uygulamalar** — parçacıklar bir iPhone silüetine dönüşür (ikon renkleri uygulamaların renkleri). Ardından 4 öne çıkan
-  uygulama yapışkan, üst üste binen kartlarda; her biri için elle kurulmuş, görselsiz UI mock'ları ve Halı Saha
-  Tycoon'un gerçek mağaza ekranları. Altında 14 uygulamalık katalog ve imleci takip eden ikon önizlemesi.
-- **İletişim** — parçacıklar dönen bir galaksiye dönüşür.
+- **Uygulamalar:** parçacıklar iPhone 15 Pro oranlarında bir ana ekrana dönüşür. Işık alan titanyum çerçeve ve yan
+  tuşlar, açılıp kapanan Dynamic Island, canlı bir widget grafiği, ikonlar üzerinden geçen bir dalga ve cam yansıması
+  içerir; telefon süzülür ve yavaşça döner. Ardından her biri bir ekran olan 4 öne çıkan uygulama kartı ve mobilde iOS
+  ana ekranı gibi görünen uygulama kataloğu gelir.
+- **Alt bölümler:** sahne tamamen söner ve render durur; deneyim, yetkinlikler ve iletişim bölümlerinde arka plan
+  animasyonu yoktur.
 
 ## Teknoloji
 
@@ -18,7 +19,7 @@ Sayfanın merkezinde, scroll ile şekil değiştiren GPU tabanlı bir parçacık
 | --------- | ---------------------------------------------------------------------------- |
 | Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript (strict)            |
 | 3B        | three.js + @react-three/fiber, özel GLSL vertex/fragment shader              |
-| Animasyon | motion (Framer Motion), Lenis (smooth scroll)                                |
+| Animasyon | motion (Framer Motion), Lenis (smooth scroll + snap)                         |
 | Stil      | Tailwind CSS v4 (`@theme` token'ları), next/font (Geist, Playfair Display)   |
 | SEO       | Metadata API, JSON-LD `Person`, dinamik OG görseli, sitemap, robots, ikonlar |
 
@@ -39,9 +40,9 @@ Bileşenlere dokunmadan, tüm metinler `src/content/` altında:
 
 | Dosya           | İçerik                                                                |
 | --------------- | --------------------------------------------------------------------- |
-| `site.ts`       | isim, unvan, iletişim, sosyal linkler, özgeçmiş yolu                  |
-| `about.ts`      | hakkımda metni, istatistikler (uygulama sayısı katalogdan hesaplanır) |
-| `apps.ts`       | öne çıkan 4 uygulama + tüm katalog (App Store linkleri)               |
+| `site.ts`       | isim, unvan, tanıtım cümlesi, iletişim, sosyal linkler, özgeçmiş yolu |
+| `about.ts`      | hakkımda metni, istatistikler, yaklaşım maddeleri                     |
+| `apps.ts`       | öne çıkan 4 uygulama ve tüm katalog (App Store linkleri, kısa adlar)  |
 | `experience.ts` | iş deneyimi, eğitim, sertifikalar (işveren adı bilinçli olarak yok)   |
 | `stack.ts`      | yetkinlik grupları ve kayan yazı bandı                                |
 
@@ -69,32 +70,39 @@ src/
 ├── app/             layout (font, metadata, JSON-LD), page, OG/ikon/sitemap/robots
 ├── content/         tüm metin ve veri (tek doğruluk kaynağı)
 ├── components/
-│   ├── layout/      Nav (aktif bölüm, mobil menü), SmoothScroll (Lenis + MotionConfig)
-│   ├── sections/    Hero, About, Apps, Experience, Stack, Contact
+│   ├── layout/      Nav (aktif bölüm, mobil menü), SmoothScroll (Lenis, bölüm snap, MotionConfig)
+│   ├── sections/    Hero, About, Principles, Apps (giriş, kartlar, katalog), Experience, Stack, Contact
 │   ├── mocks/       uygulama UI mock'ları (CSS ile, görselsiz)
-│   └── ui/          Reveal/SplitText/Magnetic/Counter, PhoneFrame, AppGlyph, ikonlar
+│   └── ui/          Section, ScaleToFit, Reveal/SplitText/Magnetic/Counter, PhoneFrame, AppGlyph, ikonlar
 └── scene/
-    ├── shapes.ts        deterministik nokta bulutları (portre, telefon, galaksi)
+    ├── shapes.ts        deterministik nokta bulutları (portre, parça kimlikli iPhone)
     ├── shapes.worker.ts şekilleri Web Worker'da üretir (typed array transfer)
-    ├── shaders.ts       morph + girdap + imleç etkileşimi (tek draw call)
+    ├── shaders.ts       morph, telefon animasyonları ve ışıklandırma, imleç etkileşimi (tek draw call)
     ├── director.ts      DOM'daki `data-scene` çapalarından scroll'a bağlı sahne durumu
-    ├── ParticleCanvas   R3F canvas, adaptif kalite (DPR + parçacık bütçesi)
+    ├── ParticleCanvas   R3F canvas, adaptif kalite, görünmezken render durdurma
     └── SceneLayer       lazy-load, WebGL tespiti, CSS fallback
 ```
 
+- **Ekrana oturan bölümler.** Her bölüm `Section` bileşeniyle en az bir ekran yüksekliğindedir; başlık, metin ve
+  boşluklar hem genişliğe hem yüksekliğe göre (`min(vw, svh)`) ölçeklenir. Tek ekrana sığmayan içerikler ekranın
+  boyutuna göre biçim değiştirir: katalog mobilde ikon ızgarası, deneyim mobil ve tablette kaydırmalı kartlar,
+  yetkinlikler sekmeler. Mock'lar `ScaleToFit` ile kartın içine ölçeklenir. `short`/`tall`/`xtall` Tailwind
+  varyantları ekran yüksekliğine göre ikincil içerikleri açıp kapatır. 375×667 (iPhone SE) ile 1920×1080 arasındaki
+  yaygın ekranlarda her bölümün tek ekrana sığdığı otomatik olarak test edilmiştir; daha küçük ekranlarda bölümler
+  taşmak yerine uzar.
+- **Bölüm snap.** Fare ve trackpad için `lenis/snap` (yakınlık tabanlı, bölümün başı ve sonu), dokunmatik cihazlarda
+  native CSS scroll-snap kullanılır; Lenis bir çapa linkine animasyonla giderken CSS snap geçici olarak kapanır.
 - **Sahne koreografisi deklaratif.** Bölümler `data-scene="apps"` gibi çapalar bırakır; `SceneDirector` hangi çapanın
-  ekranın ortasında olduğuna göre durumu (şekil, konum, ölçek, parlaklık) enterpolasyonla hesaplar. Bölüm sırası
-  değişse bile WebGL koduna dokunmak gerekmez.
+  ekranın ortasında olduğuna göre durumu (şekil, konum, ölçek, parlaklık) enterpolasyonla hesaplar.
 - **Performans.**
-  - three.js ana bundle'da değil (`next/dynamic`, `ssr: false`); nokta bulutları Web Worker'da üretilir, ana thread
-    hiç bloklanmaz. Tüm animasyon GPU'da, kare başına sıfır allocation.
+  - three.js ana bundle'da değil (`next/dynamic`, `ssr: false`); nokta bulutları Web Worker'da üretilir. Tüm animasyon
+    GPU'da, kare başına sıfır allocation.
   - Adaptif kalite: kare süresi sürekli ölçülür; yavaşlık sürerse önce DPR (1.5 → 1.25 → 1), sonra çizilen parçacık
-    sayısı kademeli düşer. Sahne içeriğin arkasında sönükken zaten daha az parçacık çizilir.
-  - Canlı WebGL tuvalinin üstünde `backdrop-filter` ve `filter: blur` animasyonu kullanılmaz (her karede yeniden
-    hesaplanırlar); reveal animasyonları yalnızca `transform` + `opacity`.
-  - Mobilde ve ≤4 çekirdekli cihazlarda parçacık sayısı yarıya iner. WebGL yoksa sayfa CSS arka planıyla tam çalışır.
+    sayısı kademeli düşer. Sahne sönükken daha az, tamamen söndüğünde hiç çizilmez.
+  - Canlı WebGL tuvalinin üstünde `backdrop-filter` ve `filter: blur` animasyonu kullanılmaz; reveal animasyonları
+    yalnızca `transform` ve `opacity` kullanır.
 - **Erişilebilirlik.** Semantik başlık hiyerarşisi, "içeriğe geç" linki, klavye odak stilleri, animasyonlu metinlerde
-  ekran okuyucu için düz metin, `prefers-reduced-motion` desteği (Lenis, motion ve shader zamanı durur).
+  ekran okuyucu için düz metin, sekmeler için ARIA rolleri, `prefers-reduced-motion` desteği.
 
 ## Lisanslar
 

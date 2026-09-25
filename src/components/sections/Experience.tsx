@@ -1,117 +1,80 @@
-"use client";
-
 import { Award, GraduationCap } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useSpring } from "motion/react";
-import { useRef } from "react";
 import { Reveal } from "@/components/ui/motion";
+import { Section } from "@/components/ui/Section";
 import { SectionHeading, serifGold } from "@/components/ui/SectionHeading";
 import { certificates, education, experience } from "@/content/experience";
 
 export function Experience() {
-  const timeline = useRef<HTMLOListElement>(null);
-  const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: timeline, offset: ["start 70%", "end 60%"] });
-  const fill = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
-
   return (
-    <section id="deneyim" className="relative py-28 md:py-40">
-      <div data-scene="experience" aria-hidden className="absolute top-1/3 left-0 h-px w-px" />
-      <div className="container-page">
+    <Section id="deneyim">
+      <div className="container-page section-y flex flex-1 flex-col justify-center">
         <SectionHeading
-          index="03"
+          index="04"
           label="Deneyim"
-          title={[{ text: "Endüstriyel veriden" }, { text: "cebinizdeki ekrana.", className: serifGold }]}
-          description="Kurumsal ekiplerde servisten arayüze uçtan uca yazılım geliştiriyor, aynı disiplini kendi ürünlerime taşıyorum."
+          title={[{ text: "Kurumsal servislerden" }, { text: "cebinizdeki ekrana.", className: serifGold }]}
         />
 
-        <div className="mt-16 grid gap-14 md:mt-24 md:grid-cols-12 md:gap-10">
-          <ol ref={timeline} className="relative md:col-span-8">
-            <span aria-hidden className="absolute top-2 bottom-2 left-[7px] w-px bg-line md:left-[9px]" />
-            <motion.span
-              aria-hidden
-              style={{ scaleY: reduced ? 1 : fill }}
-              className="absolute top-2 bottom-2 left-[7px] w-px origin-top bg-gradient-to-b from-accent via-ember to-accent/0 md:left-[9px]"
-            />
-            {experience.map((role, i) => (
-              <Reveal
-                as="li"
-                key={`${role.company}-${role.period}`}
-                delay={i * 0.05}
-                className="relative pb-14 pl-10 last:pb-0 md:pl-14"
-              >
-                <span
-                  aria-hidden
-                  className={`absolute top-2 left-0 grid h-[15px] w-[15px] place-items-center rounded-full border md:h-[19px] md:w-[19px] ${
-                    role.current ? "border-accent bg-accent/20" : "border-line-strong bg-bg"
-                  }`}
-                >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${role.current ? "animate-pulse-dot bg-accent" : "bg-fg-3"}`}
-                  />
-                </span>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                  <span className="label tabular-nums">{role.period}</span>
-                  {role.current && (
-                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium tracking-wider text-accent uppercase">
-                      Şu an
-                    </span>
-                  )}
-                </div>
-                <h3 className="mt-3 text-2xl font-medium tracking-[-0.03em] md:text-[2rem]">{role.title}</h3>
-                <p className="mt-1 text-fg-2">
-                  {role.company}
-                  {role.team && <span className="text-fg-3"> — {role.team}</span>}
-                </p>
-                <p className="mt-4 max-w-2xl leading-relaxed text-pretty text-fg-2">{role.summary}</p>
-                {role.highlights && (
-                  <ul className="mt-4 max-w-2xl space-y-2">
-                    {role.highlights.map((h) => (
-                      <li key={h} className="flex gap-3 text-sm leading-relaxed text-fg-2">
-                        <span aria-hidden className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-accent" />
-                        {h}
-                      </li>
-                    ))}
-                  </ul>
+        {/* Phones and tablets: a swipeable row of cards. Desktop: three columns. */}
+        <ol className="no-scrollbar -mx-5 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 md:-mx-10 md:mt-[5svh] md:px-10 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-4 lg:overflow-visible lg:px-0">
+          {experience.map((role, i) => (
+            <Reveal
+              as="li"
+              key={`${role.title}-${role.period}`}
+              delay={i * 0.06}
+              className="flex w-[84%] shrink-0 snap-start flex-col rounded-3xl border border-line bg-bg-2/95 p-5 md:w-[46%] md:p-[clamp(1.25rem,3.2svh,1.9rem)] lg:w-auto"
+            >
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="label tabular-nums">{role.period}</span>
+                {role.current && (
+                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium tracking-wider text-accent uppercase">
+                    Şu an
+                  </span>
                 )}
-                <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Teknolojiler">
-                  {role.tags.map((t) => (
-                    <li key={t} className="rounded-full border border-line px-3 py-1 font-mono text-[11px] text-fg-2">
-                      {t}
+              </div>
+              <h3 className="mt-3 text-xl font-medium tracking-[-0.03em] md:mt-[2svh] md:text-[clamp(1.25rem,2.9svh,1.65rem)]">
+                {role.title}
+              </h3>
+              <p className="mt-1 text-sm text-fg-3">{role.org}</p>
+              <p className="mt-3 text-sm leading-relaxed text-pretty text-fg-2 md:mt-[1.8svh] md:text-[clamp(0.875rem,1.9svh,0.95rem)]">
+                {role.summary}
+              </p>
+              {role.highlights && (
+                <ul className="mt-[1.8svh] hidden space-y-1.5 lg:xtall:block">
+                  {role.highlights.map((h) => (
+                    <li key={h} className="flex gap-2.5 text-[13px] leading-snug text-fg-2">
+                      <span aria-hidden className="mt-[0.5em] h-1 w-1 shrink-0 rounded-full bg-accent" />
+                      {h}
                     </li>
                   ))}
                 </ul>
-              </Reveal>
-            ))}
-          </ol>
+              )}
+              <ul className="mt-auto flex flex-wrap gap-1.5 pt-4 md:pt-[2.4svh]" aria-label="Teknolojiler">
+                {role.tags.map((t) => (
+                  <li key={t} className="rounded-full border border-line px-2.5 py-1 font-mono text-[11px] text-fg-2">
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          ))}
+        </ol>
 
-          <aside className="space-y-6 md:col-span-4">
-            <div className="md:sticky md:top-28 md:space-y-6">
-              <Reveal className="rounded-3xl border border-line bg-bg-2/95 p-6 md:p-7">
-                <GraduationCap className="text-accent" size={22} aria-hidden />
-                <p className="mt-5 label">Eğitim</p>
-                <p className="mt-2 text-xl font-medium tracking-tight">{education.school}</p>
-                <p className="mt-1 text-fg-2">{education.degree}</p>
-                <p className="mt-3 font-mono text-xs text-fg-3">{education.period}</p>
-              </Reveal>
-              <Reveal delay={0.08} className="mt-6 rounded-3xl border border-line bg-bg-2/95 p-6 md:mt-0 md:p-7">
-                <Award className="text-accent" size={22} aria-hidden />
-                <p className="mt-5 label">Sertifikalar</p>
-                <ul className="mt-4 space-y-3">
-                  {certificates.map((c) => (
-                    <li
-                      key={c.name}
-                      className="flex items-baseline justify-between gap-4 border-b border-line pb-3 last:border-0 last:pb-0"
-                    >
-                      <span className="text-sm text-fg">{c.name}</span>
-                      <span className="shrink-0 font-mono text-[11px] text-fg-3">{c.issuer}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-            </div>
-          </aside>
-        </div>
+        <Reveal className="mt-5 grid gap-3 text-sm text-fg-3 md:mt-[4svh] md:grid-cols-2 md:gap-6">
+          <p className="flex items-start gap-3">
+            <GraduationCap size={18} className="mt-0.5 shrink-0 text-accent" aria-hidden />
+            <span>
+              <span className="text-fg-2">{education.school}</span>, {education.degree}. {education.period}
+              <span className="hidden md:inline">. {education.notes.join(", ")}.</span>
+            </span>
+          </p>
+          <p className="flex items-start gap-3 max-md:hidden">
+            <Award size={18} className="mt-0.5 shrink-0 text-accent" aria-hidden />
+            <span>
+              <span className="text-fg-2">Sertifikalar:</span> {certificates.map((c) => c.name).join(", ")}
+            </span>
+          </p>
+        </Reveal>
       </div>
-    </section>
+    </Section>
   );
 }
