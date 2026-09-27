@@ -1,6 +1,3 @@
-import { socials } from "./site";
-
-const developerPage = socials.appStore.href;
 /** Region-less App Store link — Apple redirects to the visitor's own storefront. */
 const store = (id: string) => `https://apps.apple.com/app/id${id}`;
 
