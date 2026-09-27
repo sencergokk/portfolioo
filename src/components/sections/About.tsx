@@ -9,9 +9,9 @@ export function About() {
   return (
     <Section id="hakkimda" scene="about">
       <div className="container-page section-y grid flex-1 content-center items-center gap-5 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-12 lg:gap-16">
-        {/* Portrait: a wide crop on phones, a tall card on larger screens */}
+        {/* Portrait: a full square on phones, a tall card on larger screens */}
         <Reveal>
-          <figure className="relative h-[24svh] overflow-hidden rounded-3xl border border-line bg-bg-2 short:h-[20svh] md:aspect-[4/5] md:h-auto md:max-h-[74svh] md:w-full md:rounded-[28px] md:short:h-auto">
+          <figure className="relative mx-auto aspect-square w-[min(100%,40svh)] overflow-hidden rounded-3xl border border-line bg-bg-2 short:w-[min(100%,32svh)] md:aspect-[4/5] md:max-h-[74svh] md:w-full md:rounded-[28px] md:short:w-full">
             <div
               aria-hidden
               className="absolute inset-[-20%] bg-[radial-gradient(45%_40%_at_55%_38%,rgb(232_184_107/0.35),transparent_70%),radial-gradient(35%_30%_at_30%_80%,rgb(255_138_76/0.14),transparent_70%)]"
@@ -25,7 +25,7 @@ export function About() {
               alt={site.photo.alt}
               fill
               sizes="(min-width: 768px) 40vw, 92vw"
-              className="object-cover object-[50%_28%] md:object-bottom"
+              className="object-cover md:object-bottom"
             />
             <div
               aria-hidden

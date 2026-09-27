@@ -7,7 +7,7 @@
 
 export const RINGS = [
   { radius: 0.3, count: 6, speed: 0.12 },
-  { radius: 0.52, count: 9, speed: -0.07 },
+  { radius: 0.52, count: 10, speed: -0.07 },
 ] as const;
 
 export const ICON_SIZE = 0.14;

@@ -76,7 +76,7 @@ export const featuredApps: readonly FeaturedApp[] = [
       "Reklamsız, aboneliksiz freemium model",
     ],
     stack: ["SwiftUI", "Canvas", "StoreKit", "XcodeGen", "fastlane"],
-    href: developerPage,
+    href: store("6801822720"),
     accent: { from: "#3f9b52", to: "#e8b86b" },
     visual: "halisaha",
   },
@@ -147,7 +147,7 @@ export const catalog: readonly CatalogApp[] = [
     blurb: "Halı sahadan futbol imparatorluğuna uzanan idle tycoon oyunu.",
     glyph: "pitch",
     accent: { from: "#3f9b52", to: "#e8b86b" },
-    href: developerPage,
+    href: store("6801822720"),
     featured: true,
     icon: "/apps/halisaha-icon.png",
   },
@@ -161,6 +161,7 @@ export const catalog: readonly CatalogApp[] = [
     accent: { from: "#f59e0b", to: "#ef4444" },
     href: store("6787492253"),
     featured: true,
+    icon: "/apps/theft-alarm-icon.png",
   },
   {
     slug: "kpss-go",
@@ -172,6 +173,7 @@ export const catalog: readonly CatalogApp[] = [
     accent: { from: "#4f7cff", to: "#9b8cff" },
     href: store("6746972924"),
     featured: true,
+    icon: "/apps/kpss-go-icon.png",
   },
   {
     slug: "ingilizce-ogren",
@@ -182,6 +184,7 @@ export const catalog: readonly CatalogApp[] = [
     glyph: "languages",
     accent: { from: "#22c55e", to: "#0ea5e9" },
     href: store("6778374680"),
+    icon: "/apps/ingilizce-ogren-icon.png",
   },
   {
     slug: "masalai",
@@ -193,6 +196,7 @@ export const catalog: readonly CatalogApp[] = [
     accent: { from: "#a855f7", to: "#f472b6" },
     href: store("6737716152"),
     featured: true,
+    icon: "/apps/masalai-icon.png",
   },
   {
     slug: "cooka",
@@ -203,6 +207,7 @@ export const catalog: readonly CatalogApp[] = [
     glyph: "chef",
     accent: { from: "#fb923c", to: "#f43f5e" },
     href: store("6738347469"),
+    icon: "/apps/cooka-icon.png",
   },
   {
     slug: "notishine",
@@ -213,6 +218,7 @@ export const catalog: readonly CatalogApp[] = [
     glyph: "sun",
     accent: { from: "#facc15", to: "#fb923c" },
     href: store("6742649551"),
+    icon: "/apps/notishine-icon.png",
   },
   {
     slug: "sleep-sounds-plus",
@@ -223,6 +229,7 @@ export const catalog: readonly CatalogApp[] = [
     glyph: "moon",
     accent: { from: "#6366f1", to: "#1e1b4b" },
     href: store("6792748576"),
+    icon: "/apps/sleep-sounds-plus-icon.png",
   },
   {
     slug: "medication-tracking",
@@ -233,16 +240,18 @@ export const catalog: readonly CatalogApp[] = [
     glyph: "pill",
     accent: { from: "#14b8a6", to: "#22c55e" },
     href: store("6745835442"),
+    icon: "/apps/medication-tracking-icon.png",
   },
   {
     slug: "speaker-cleaner-water-remover",
-    name: "Speaker Cleaner Water Remover",
+    name: "Speaker Water Eject & Dust",
     shortName: "Cleaner",
     category: "Araçlar",
     blurb: "Ses frekansı ve titreşimle hoparlördeki nemi ve tozu dışarı atar.",
     glyph: "droplets",
     accent: { from: "#22d3ee", to: "#3b82f6" },
     href: store("6746083491"),
+    icon: "/apps/speaker-cleaner-water-remover-icon.png",
   },
   {
     slug: "speaker-cleaner-get-water-out",
@@ -252,7 +261,8 @@ export const catalog: readonly CatalogApp[] = [
     blurb: "Tek dokunuşla frekans dalgalarıyla hoparlör temizliği.",
     glyph: "waves",
     accent: { from: "#38bdf8", to: "#6366f1" },
-    href: developerPage,
+    href: store("6791226633"),
+    icon: "/apps/speaker-cleaner-get-water-out-icon.png",
   },
   {
     slug: "ehliyetbox",
@@ -262,7 +272,8 @@ export const catalog: readonly CatalogApp[] = [
     blurb: "Firebase destekli güncel soru bankasıyla ehliyet sınavı hazırlığı.",
     glyph: "car",
     accent: { from: "#f97316", to: "#dc2626" },
-    href: developerPage,
+    href: store("6740466156"),
+    icon: "/apps/ehliyetbox-icon.png",
   },
   {
     slug: "beauty-salon-tycoon",
@@ -272,7 +283,8 @@ export const catalog: readonly CatalogApp[] = [
     blurb: "Küçük bir salonu güzellik zincirine dönüştürdüğün idle oyun.",
     glyph: "scissors",
     accent: { from: "#ec4899", to: "#f59e0b" },
-    href: developerPage,
+    href: store("6809159412"),
+    icon: "/apps/beauty-salon-tycoon-icon.png",
   },
   {
     slug: "yds",
@@ -282,7 +294,8 @@ export const catalog: readonly CatalogApp[] = [
     blurb: "YDS'ye hazırlananlar için konu bazlı soru bankası.",
     glyph: "graduation",
     accent: { from: "#0ea5e9", to: "#8b5cf6" },
-    href: developerPage,
+    href: store("6749510139"),
+    icon: "/apps/yds-icon.png",
   },
   {
     slug: "yazar-eser-ayt",
@@ -292,6 +305,18 @@ export const catalog: readonly CatalogApp[] = [
     blurb: "AYT edebiyatında yazar ve eser eşleştirmeleri için çalışma kitabı.",
     glyph: "library",
     accent: { from: "#eab308", to: "#b45309" },
-    href: developerPage,
+    href: store("6770453951"),
+    icon: "/apps/yazar-eser-ayt-icon.png",
+  },
+  {
+    slug: "recipe-chef",
+    name: "Recipe Chef: Merge & Cook",
+    shortName: "Recipe Chef",
+    category: "Oyun",
+    blurb: "Malzemeleri birleştirip yemeğe dönüştürdüğün merge ve mutfak oyunu.",
+    glyph: "chef",
+    accent: { from: "#f97316", to: "#facc15" },
+    href: store("6813817710"),
+    icon: "/apps/recipe-chef-icon.png",
   },
 ];
